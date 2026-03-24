@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ApexOps AI</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --n0:#080f1a;--n1:#0b1624;--n2:#0f1e30;--n3:#14273d;--n4:#1a3050;
+  --blue:#1a7fd4;--teal:#0fb8c9;--mint:#22c55e;--amber:#f59e0b;--rose:#f43f5e;--purple:#818cf8;--cyan:#38bdf8;
+  --text:#ddeeff;--text2:#7aa3c8;--text3:#3a6080;
+  --border:rgba(26,127,212,0.15);--border2:rgba(26,127,212,0.28);--border3:rgba(26,127,212,0.45);
+}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--n0);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:13px;}
+
+/* LOGIN */
+#login{position:fixed;inset:0;z-index:200;background:var(--n0);display:flex;align-items:center;justify-content:center;}
+.lcard{width:340px;background:var(--n2);border:1px solid var(--border2);border-radius:16px;padding:32px;}
+.logo-w{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+.logo-i{width:36px;height:36px;background:linear-gradient(135deg,#1a7fd4,#0fb8c9);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;}
+.logo-n{font-size:17px;font-weight:700;color:var(--text);}
+.logo-s{font-size:9px;color:var(--teal);letter-spacing:.14em;font-weight:600;text-transform:uppercase;}
+.fg{margin-bottom:13px;}
+.flbl{display:block;font-size:11px;color:var(--text3);font-weight:600;margin-bottom:5px;}
+.finp{width:100%;padding:9px 12px;background:var(--n3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .18s;}
+.finp:focus{border-color:var(--blue);}
+.btn-pri{width:100%;padding:10px;background:linear-gradient(135deg,#1a7fd4,#0d6ab5);border:none;border-radius:7px;color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;}
+.btn-pri:hover{opacity:.88;}
+.lerr{color:var(--rose);font-size:11px;text-align:center;margin-top:7px;min-height:14px;}
+.dhint{text-align:center;margin-top:10px;font-size:11px;color:var(--text3);}
+.dhint span{color:var(--blue);cursor:pointer;}
+
+/* APP */
+#app{display:none;flex-direction:column;min-height:100vh;}
+
+/* TOPBAR */
+.tb{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 16px;background:var(--n1);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:100;}
+.tb-l{display:flex;align-items:center;gap:8px;}
+.tb-i{width:26px;height:26px;background:linear-gradient(135deg,#1a7fd4,#0fb8c9);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff;}
+.tb-n{font-size:14px;font-weight:700;}
+.tb-nav{display:flex;gap:2px;}
+.tn{padding:4px 11px;border-radius:4px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;transition:all .15s;}
+.tn:hover,.tn.on{background:var(--n3);color:var(--text);}
+.tb-r{display:flex;align-items:center;gap:8px;}
+.av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;cursor:pointer;}
+
+/* LOCAL BAR */
+.lbar{display:flex;align-items:center;gap:6px;padding:7px 16px;background:var(--n1);border-bottom:1px solid var(--border);overflow-x:auto;}
+.lbtn{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:4px;border:1px solid var(--border2);background:var(--n2);color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.lbtn.on{color:#fff;border-color:transparent;}
+.lbtn:hover{background:var(--n3);}
+.ldot{width:6px;height:6px;border-radius:50%;}
+.ladd{padding:4px 10px;border-radius:4px;border:1px dashed var(--border3);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;white-space:nowrap;}
+.ladd:hover{border-color:var(--blue);color:var(--blue);}
+.lbar-lbl{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+
+/* CONTENT */
+.content{padding:14px 16px;flex:1;}
+.view{display:none;flex-direction:column;gap:11px;}
+.view.on{display:flex;}
+
+/* CARDS */
+.card{background:var(--n2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:11px;}
+.ct{font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.05em;}
+.cs{font-size:10px;color:var(--text3);margin-top:2px;}
+.bdg{padding:2px 8px;border-radius:3px;font-size:10px;font-weight:600;}
+.bg{background:rgba(34,197,94,.12);color:var(--mint);}
+.br{background:rgba(244,63,94,.12);color:var(--rose);}
+.ba{background:rgba(245,158,11,.12);color:var(--amber);}
+.bb{background:rgba(56,189,248,.12);color:var(--cyan);}
+
+/* KPI */
+.krow{display:grid;gap:9px;}
+.k5{grid-template-columns:repeat(5,1fr);}
+.k4{grid-template-columns:repeat(4,1fr);}
+.k3{grid-template-columns:repeat(3,1fr);}
+.k2{grid-template-columns:repeat(2,1fr);}
+.kpi{background:var(--n2);border:1px solid var(--border);border-radius:7px;padding:13px 15px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s;}
+.kpi:hover{border-color:var(--border2);}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--blue));}
+.kl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.kv{font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.1;}
+.kc2{font-size:11px;margin-top:4px;}
+.up{color:var(--mint);}.dn{color:var(--rose);}.wn{color:var(--amber);}.nt{color:var(--text3);}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:11px;}
+
+/* FORM INPUTS */
+.inp{background:var(--n3);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-family:inherit;font-size:12px;padding:6px 10px;outline:none;width:100%;}
+.inp:focus{border-color:var(--blue);}
+.inp-sm{width:90px;text-align:right;}
+select.inp{cursor:pointer;}
+.flabel{display:block;font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.fgroup{margin-bottom:10px;}
+.frow{display:grid;gap:8px;margin-bottom:8px;}
+.fr2{grid-template-columns:1fr 1fr;}
+.fr3{grid-template-columns:1fr 1fr 1fr;}
+.fr4{grid-template-columns:1fr 1fr 1fr 1fr;}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:6px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.btn:hover{opacity:.85;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-mint{background:rgba(34,197,94,.15);color:var(--mint);border:1px solid rgba(34,197,94,.3);}
+.btn-red{background:rgba(244,63,94,.12);color:var(--rose);border:1px solid rgba(244,63,94,.25);}
+.btn-gray{background:var(--n3);color:var(--text2);border:1px solid var(--border2);}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:5px 9px;border-bottom:1px solid var(--border2);text-align:left;}
+.tbl td{padding:7px 9px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--n3);}
+.tbl-actions{display:flex;gap:5px;}
+
+/* BAR ROWS */
+.brow{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);}
+.brow:last-child{border-bottom:none;}
+.brow-n{font-size:12px;color:var(--text);min-width:100px;}
+.brow-b{flex:1;height:5px;background:var(--n4);border-radius:3px;overflow:hidden;}
+.brow-f{height:100%;border-radius:3px;}
+.brow-v{font-size:11px;font-variant-numeric:tabular-nums;min-width:52px;text-align:right;}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.65);align-items:center;justify-content:center;padding:16px;}
+.modal.on{display:flex;}
+.mcard{background:var(--n2);border:1px solid var(--border2);border-radius:13px;padding:24px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.mtitle{font-size:15px;font-weight:700;color:var(--text);margin-bottom:18px;}
+.mbtns{display:flex;gap:8px;margin-top:16px;}
+.mbtn{flex:1;padding:8px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;border:none;}
+.mbtn:hover{opacity:.85;}
+.mbtn-pri{background:var(--blue);color:#fff;}
+.mbtn-sec{background:var(--n3);color:var(--text2);}
+
+/* RANK */
+.rank-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);}
+.rank-row:last-child{border-bottom:none;}
+.rank-n{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.rank-info{flex:1;}
+.rank-name{font-size:12px;font-weight:600;color:var(--text);}
+.rank-sub{font-size:10px;color:var(--text3);}
+.rank-bar{width:60px;height:3px;background:var(--n4);border-radius:2px;margin-top:3px;}
+.rank-fill{height:100%;border-radius:2px;}
+
+/* DIAG */
+.diag{display:flex;align-items:flex-start;gap:10px;padding:11px;border-radius:7px;margin-bottom:7px;border:1px solid;}
+.diag-t{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.diag-d{font-size:11px;color:var(--text2);line-height:1.5;}
+
+/* PROJ */
+.pslider{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.pslider label{font-size:11px;color:var(--text2);min-width:120px;}
+.pslider input[type=range]{flex:1;accent-color:var(--blue);}
+.pslider span{font-size:11px;color:var(--cyan);min-width:36px;text-align:right;}
+.pr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:9px 0;}
+.pr{background:var(--n3);border:1px solid var(--border2);border-radius:6px;padding:9px 10px;text-align:center;}
+.pr-l{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:3px;}
+.pr-v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;}
+
+/* PILL */
+.rpill{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;}
+
+/* NOTIFY */
+#notify{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:6px;}
+.notif{padding:10px 16px;border-radius:7px;font-size:12px;font-weight:500;color:#fff;animation:slideIn .25s ease;max-width:280px;}
+.notif.ok{background:#22c55e;}
+.notif.err{background:#f43f5e;}
+.notif.info{background:#1a7fd4;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+canvas{display:block;}
+.leg{display:flex;flex-wrap:wrap;gap:9px;margin-top:7px;}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);}
+.ld{width:7px;height:7px;border-radius:2px;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--n2);}
+::-webkit-scrollbar-thumb{background:var(--n4);border-radius:2px;}
+@media(max-width:680px){
+  .k5,.k4{grid-template-columns:repeat(2,1fr);}
+  .k3{grid-template-columns:repeat(2,1fr);}
+  .g2,.g3,.g21{grid-template-columns:1fr;}
+  .tb-nav{display:none;}
+  .fr3,.fr4{grid-template-columns:1fr 1fr;}
+}
+.sep{height:1px;background:var(--border);margin:12px 0;}
+.tag{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;}
+</style>
+</head>
+<body>
+
+<!-- NOTIFY -->
+<div id="notify"></div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lcard">
+    <div class="logo-w">
+      <div class="logo-i">A</div>
+      <div><div class="logo-n">ApexOps AI</div><div class="logo-s">Business Intelligence</div></div>
+    </div>
+    <div class="fg"><label class="flbl">Usuario</label><input class="finp" id="lu" value="admin@apexops.ai" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="fg"><label class="flbl">Contraseña</label><input class="finp" id="lp" type="password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-pri" onclick="doLogin()">Ingresar</button>
+    <div class="lerr" id="lerr"></div>
+    <div class="dhint">Demo — <span onclick="doLogin()">entrar directo</span></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="tb">
+    <div class="tb-l">
+      <div class="tb-i">A</div>
+      <div><div class="tb-n">ApexOps AI</div></div>
+    </div>
+    <div class="tb-nav">
+      <button class="tn on" onclick="goTab('dashboard',this)">Dashboard</button>
+      <button class="tn" onclick="goTab('ingresar',this)">Ingresar datos</button>
+      <button class="tn" onclick="goTab('locales',this)">Locales</button>
+      <button class="tn" onclick="goTab('productos',this)">Productos</button>
+      <button class="tn" onclick="goTab('nomina',this)">Nómina</button>
+      <button class="tn" onclick="goTab('proyeccion',this)">Proyección</button>
+      <button class="tn" onclick="goTab('diagnostico',this)">Diagnóstico</button>
+    </div>
+    <div class="tb-r">
+      <select class="inp" id="mes-sel" onchange="renderDashboard()" style="width:auto;padding:3px 8px;font-size:11px;"></select>
+      <div class="av" onclick="logout()" title="Cerrar sesión">AD</div>
+    </div>
+  </div>
+
+  <div class="lbar">
+    <span class="lbar-lbl">Local:</span>
+    <div id="local-btns" style="display:flex;gap:5px;flex-wrap:nowrap;"></div>
+    <button class="ladd" onclick="openModal('modal-local')">+ Agregar local</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="view on" id="tab-dashboard">
+      <div class="krow k5" id="db-kpis"></div>
+      <div class="g21">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Ventas por local — últimos meses</div><div class="cs">Comparativo mensual</div></div><span class="bdg bg" id="db-vtend">—</span></div>
+          <div style="position:relative;height:195px"><canvas id="db-cv"></canvas></div>
+          <div class="leg" id="db-leg"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Ranking rentabilidad</div></div></div>
+          <div id="db-rank"></div>
+        </div>
+      </div>
+      <div class="g3">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Ventas vs Gastos</div><div class="cs">Mes seleccionado</div></div></div>
+          <div style="position:relative;height:170px"><canvas id="db-vg"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Mermas por local</div></div><span class="bdg ba" id="db-merma-bdg"></span></div>
+          <div id="db-mermas"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Top productos vendidos</div></div></div>
+          <div id="db-top-prod"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INGRESAR DATOS ===== -->
+    <div class="view" id="tab-ingresar">
+      <div class="g2">
+
+        <!-- VENTAS -->
+        <div class="card">
+          <div class="ch"><div><div class="ct">Registrar venta</div><div class="cs">Ingresa las ventas del día por local</div></div><span class="bdg bb">diario</span></div>
+          <div class="frow fr2">
+            <div><label class="flabel">Local</label><select class="inp" id="v-local"></select></div>
+            <div><label class="flabel">Fecha</label><input type="date" class="inp" id="v-fecha"></div>
+          </div>
+          <div class="frow fr3">
+            <div><label class="flabel">Helados ($)</label><input type="number" class="inp" id="v-helados" placeholder="0.00" min="0" step="0.01"></div>
+            <div><label class="flabel">Café ($)</label><input type="number" class="inp" id="v-cafe" placeholder="0.00" min="0" step="0.01"></div>
+            <div><label class="flabel">Pastelería ($)</label><input type="number" class="inp" id="v-pasteleria" placeholder="0.00" min="0" step="0.01"></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+            <div style="font-size:12px;color:var(--text2)">Total: <b id="v-total" style="color:var(--mint)">$0.00</b></div>
+            <button class="btn btn-blue" onclick="guardarVenta()">Guardar venta</button>
+          </div>
+          <div class="sep"></div>
+          <div class="ct" style="margin-bottom:8px">Ventas registradas</div>
+          <div style="overflow-x:auto"><table class="tbl" id="tbl-ventas"><thead><tr><th>Fecha</th><th>Local</th><th>Helados</th><th>Café</th><th>Pastelería</th><th>Total</th><th></th></tr></thead><tbody id="tbody-ventas"></tbody></table></div>
+        </div>
+
+        <!-- GASTOS -->
+        <div class="card">
+          <div class="ch"><div><div class="ct">Registrar gasto</div><div class="cs">Controla todos los gastos por categoría</div></div><span class="bdg ba">control</span></div>
+          <div class="frow fr2">
+            <div><label class="flabel">Local</label><select class="inp" id="g-local"></select></div>
+            <div><label class="flabel">Fecha</label><input type="date" class="inp" id="g-fecha"></div>
+          </div>
+          <div class="frow fr2">
+            <div><label class="flabel">Categoría</label>
+              <select class="inp" id="g-cat">
+                <option>Materia Prima</option><option>Nómina</option><option>Servicios básicos</option>
+                <option>Arriendo</option><option>Mantenimiento</option><option>Marketing</option><option>Otros</option>
+              </select>
+            </div>
+            <div><label class="flabel">Monto ($)</label><input type="number" class="inp" id="g-monto" placeholder="0.00" min="0" step="0.01"></div>
+          </div>
+          <div class="fgroup"><label class="flabel">Descripción</label><input type="text" class="inp" id="g-desc" placeholder="Ej: Compra de insumos heladería"></div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-blue" onclick="guardarGasto()">Guardar gasto</button>
+          </div>
+          <div class="sep"></div>
+          <div class="ct" style="margin-bottom:8px">Gastos registrados</div>
+          <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Local</th><th>Categoría</th><th>Descripción</th><th>Monto</th><th></th></tr></thead><tbody id="tbody-gastos"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- MERMAS -->
+      <div class="card">
+        <div class="ch"><div><div class="ct">Registrar merma / producto dañado</div><div class="cs">Controla las pérdidas de inventario</div></div><span class="bdg br">mermas</span></div>
+        <div class="frow fr4">
+          <div><label class="flabel">Local</label><select class="inp" id="m-local"></select></div>
+          <div><label class="flabel">Fecha</label><input type="date" class="inp" id="m-fecha"></div>
+          <div><label class="flabel">Producto</label><select class="inp" id="m-prod"></select></div>
+          <div><label class="flabel">Causa</label>
+            <select class="inp" id="m-causa">
+              <option>Vencimiento</option><option>Derrame / rotura</option><option>Sobreproducción</option><option>Daño en transporte</option><option>Error preparación</option><option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow fr4">
+          <div><label class="flabel">Cantidad perdida</label><input type="number" class="inp" id="m-cant" placeholder="0" min="0"></div>
+          <div><label class="flabel">Costo unitario ($)</label><input type="number" class="inp" id="m-costo" placeholder="0.00" min="0" step="0.01"></div>
+          <div><label class="flabel">Pérdida total ($)</label><input type="text" class="inp" id="m-total" readonly style="background:var(--n4)"></div>
+          <div style="display:flex;align-items:flex-end;"><button class="btn btn-blue" style="width:100%" onclick="guardarMerma()">Registrar</button></div>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Fecha</th><th>Local</th><th>Producto</th><th>Causa</th><th>Cantidad</th><th>Pérdida</th><th></th></tr></thead><tbody id="tbody-mermas"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ===== LOCALES ===== -->
+    <div class="view" id="tab-locales">
+      <div class="card">
+        <div class="ch"><div><div class="ct">Mis locales</div><div class="cs">Configura nombres y datos de cada local</div></div><button class="btn btn-blue" onclick="openModal('modal-local')">+ Nuevo local</button></div>
+        <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Color</th><th>Nombre</th><th>Dirección</th><th>Encargado</th><th>Empleados</th><th>Límite gasto ($)</th><th>Acciones</th></tr></thead><tbody id="tbody-locales"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ===== PRODUCTOS ===== -->
+    <div class="view" id="tab-productos">
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Catálogo de productos</div><div class="cs">Agrega y gestiona tus productos</div></div><button class="btn btn-blue" onclick="openModal('modal-prod')">+ Nuevo producto</button></div>
+          <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Producto</th><th>Categoría</th><th>Precio venta</th><th>Costo</th><th>Margen</th><th>Acciones</th></tr></thead><tbody id="tbody-prod"></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Estadísticas de productos</div><div class="cs">Basado en ventas registradas</div></div></div>
+          <div style="position:relative;height:200px"><canvas id="prod-chart"></canvas></div>
+          <div class="sep"></div>
+          <div class="ct" style="margin-bottom:8px;font-size:11px">Top ventas del mes</div>
+          <div id="prod-top"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NÓMINA ===== -->
+    <div class="view" id="tab-nomina">
+      <div class="krow k4" id="nom-kpis"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Empleados</div><div class="cs">Personal fijo por local</div></div><button class="btn btn-blue" onclick="openModal('modal-emp')">+ Nuevo empleado</button></div>
+          <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Nombre</th><th>Rol</th><th>Local</th><th>Salario</th><th>Acciones</th></tr></thead><tbody id="tbody-emp"></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Nómina por local</div></div></div>
+          <div style="position:relative;height:195px"><canvas id="nom-chart"></canvas></div>
+          <div class="sep"></div>
+          <div class="ct" style="margin-bottom:8px;font-size:11px">% sobre ventas por local</div>
+          <div id="nom-pct"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PROYECCIÓN ===== -->
+    <div class="view" id="tab-proyeccion">
+      <div class="krow k3">
+        <div class="kpi" style="--kc:#818cf8"><div class="kl">Proyección 3 meses</div><div class="kv" id="p3">$0</div><div class="kc2 up">empresa completa</div></div>
+        <div class="kpi" style="--kc:#0fb8c9"><div class="kl">Proyección 6 meses</div><div class="kv" id="p6">$0</div><div class="kc2 up">empresa completa</div></div>
+        <div class="kpi" style="--kc:#22c55e"><div class="kl">Proyección 12 meses</div><div class="kv" id="p12">$0</div><div class="kc2 up">empresa completa</div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div><div class="ct">Parámetros de proyección</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <div class="pslider"><label>Crecimiento mensual</label><input type="range" min="0" max="20" step="0.5" value="5" id="sl-c" oninput="calcProj()"><span id="sv-c">5.0%</span></div>
+            <div class="pslider"><label>Reducción de gastos</label><input type="range" min="0" max="15" step="0.5" value="2" id="sl-r" oninput="calcProj()"><span id="sv-r">2.0%</span></div>
+            <div class="pslider"><label>Escenario</label>
+              <select id="sl-e" class="inp" onchange="calcProj()" style="flex:1">
+                <option value="0.8">Conservador</option><option value="1" selected>Base</option><option value="1.2">Optimista</option>
+              </select><span></span>
+            </div>
+          </div>
+          <div class="pr-grid">
+            <div class="pr"><div class="pr-l">Mes 1</div><div class="pr-v" style="color:var(--cyan)" id="pm1">$0</div></div>
+            <div class="pr"><div class="pr-l">Mes 3</div><div class="pr-v" style="color:var(--mint)" id="pm3">$0</div></div>
+            <div class="pr"><div class="pr-l">Mes 6</div><div class="pr-v" style="color:var(--mint)" id="pm6">$0</div></div>
+            <div class="pr"><div class="pr-l">Mes 12</div><div class="pr-v" style="color:var(--amber)" id="pm12">$0</div></div>
+          </div>
+        </div>
+        <div style="position:relative;height:190px;margin-top:10px"><canvas id="proj-chart"></canvas></div>
+        <div class="leg"><div class="li"><div class="ld" style="background:#818cf8"></div>Ventas</div><div class="li"><div class="ld" style="background:#f43f5e"></div>Gastos</div><div class="li"><div class="ld" style="background:#22c55e"></div>Utilidad</div></div>
+      </div>
+    </div>
+
+    <!-- ===== DIAGNÓSTICO ===== -->
+    <div class="view" id="tab-diagnostico">
+      <div class="krow k3">
+        <div class="kpi" style="--kc:#22c55e"><div class="kl">Estado empresa</div><div class="kv" style="font-size:15px" id="d-est">—</div><div class="kc2" id="d-est-s"></div></div>
+        <div class="kpi" style="--kc:#f59e0b"><div class="kl">Alertas activas</div><div class="kv" id="d-alrt">0</div><div class="kc2 wn" id="d-alrt-s"></div></div>
+        <div class="kpi" style="--kc:#818cf8"><div class="kl">Score general</div><div class="kv" id="d-score">0/100</div><div class="kc2 nt">salud financiera</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div><div class="ct">Diagnóstico automático</div><div class="cs">Análisis basado en tus datos reales</div></div></div>
+          <div id="d-list"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div><div class="ct">Margen por local</div><div class="cs">Histórico</div></div></div>
+          <div style="position:relative;height:195px"><canvas id="d-chart"></canvas></div>
+          <div class="leg" id="d-leg"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- MODALES -->
+<!-- LOCAL -->
+<div class="modal" id="modal-local">
+  <div class="mcard">
+    <div class="mtitle" id="modal-local-title">Nuevo local</div>
+    <input type="hidden" id="ml-id">
+    <div class="frow fr2">
+      <div><label class="flabel">Nombre del local *</label><input class="inp" id="ml-name" placeholder="Ej: Local Centro"></div>
+      <div><label class="flabel">Color</label>
+        <select class="inp" id="ml-color">
+          <option value="#22c55e">Verde</option><option value="#f59e0b">Naranja</option><option value="#f43f5e">Rojo</option>
+          <option value="#818cf8">Púrpura</option><option value="#0fb8c9">Teal</option><option value="#fb923c">Naranja claro</option>
+          <option value="#38bdf8">Celeste</option><option value="#e879f9">Fucsia</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow fr2">
+      <div><label class="flabel">Dirección</label><input class="inp" id="ml-dir" placeholder="Ej: Av. 9 de Octubre 123"></div>
+      <div><label class="flabel">Encargado</label><input class="inp" id="ml-enc" placeholder="Nombre del encargado"></div>
+    </div>
+    <div class="frow fr2">
+      <div><label class="flabel">Límite de gasto mensual ($)</label><input type="number" class="inp" id="ml-lim" placeholder="0"></div>
+      <div><label class="flabel">Número de empleados</label><input type="number" class="inp" id="ml-emp" placeholder="0"></div>
+    </div>
+    <div class="mbtns">
+      <button class="mbtn mbtn-sec" onclick="closeModal('modal-local')">Cancelar</button>
+      <button class="mbtn mbtn-pri" onclick="saveLocal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTO -->
+<div class="modal" id="modal-prod">
+  <div class="mcard">
+    <div class="mtitle" id="modal-prod-title">Nuevo producto</div>
+    <input type="hidden" id="mp-id">
+    <div class="frow fr2">
+      <div><label class="flabel">Nombre del producto *</label><input class="inp" id="mp-name" placeholder="Ej: Helado doble"></div>
+      <div><label class="flabel">Categoría</label>
+        <select class="inp" id="mp-cat">
+          <option>Heladería</option><option>Cafetería</option><option>Pastelería</option><option>Bebidas</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow fr3">
+      <div><label class="flabel">Precio de venta ($)</label><input type="number" class="inp" id="mp-precio" placeholder="0.00" step="0.01" oninput="calcMargenProd()"></div>
+      <div><label class="flabel">Costo unitario ($)</label><input type="number" class="inp" id="mp-costo" placeholder="0.00" step="0.01" oninput="calcMargenProd()"></div>
+      <div><label class="flabel">Margen</label><input type="text" class="inp" id="mp-margen" readonly style="background:var(--n4)"></div>
+    </div>
+    <div class="frow fr2">
+      <div><label class="flabel">Emoji / ícono</label><input class="inp" id="mp-emoji" placeholder="🍦" maxlength="2"></div>
+      <div><label class="flabel">Stock mínimo (unidades)</label><input type="number" class="inp" id="mp-stock" placeholder="0"></div>
+    </div>
+    <div class="mbtns">
+      <button class="mbtn mbtn-sec" onclick="closeModal('modal-prod')">Cancelar</button>
+      <button class="mbtn mbtn-pri" onclick="saveProd()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLEADO -->
+<div class="modal" id="modal-emp">
+  <div class="mcard">
+    <div class="mtitle" id="modal-emp-title">Nuevo empleado</div>
+    <input type="hidden" id="me-id">
+    <div class="frow fr2">
+      <div><label class="flabel">Nombre completo *</label><input class="inp" id="me-nombre" placeholder="Nombre Apellido"></div>
+      <div><label class="flabel">Rol</label>
+        <select class="inp" id="me-rol">
+          <option>Gerente</option><option>Encargado</option><option>Cajero/a</option><option>Barista</option><option>Pastelero/a</option><option>Heladero/a</option><option>Ayudante</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow fr2">
+      <div><label class="flabel">Local</label><select class="inp" id="me-local"></select></div>
+      <div><label class="flabel">Salario mensual ($)</label><input type="number" class="inp" id="me-salario" placeholder="0"></div>
+    </div>
+    <div class="frow fr2">
+      <div><label class="flabel">Teléfono</label><input class="inp" id="me-tel" placeholder="+593..."></div>
+      <div><label class="flabel">Fecha de ingreso</label><input type="date" class="inp" id="me-fecha"></div>
+    </div>
+    <div class="mbtns">
+      <button class="mbtn mbtn-sec" onclick="closeModal('modal-emp')">Cancelar</button>
+      <button class="mbtn mbtn-pri" onclick="saveEmp()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ESTADO GLOBAL — todo se guarda en localStorage
+// ============================================================
+let DB = {
+  locales: [],
+  ventas: [],
+  gastos: [],
+  mermas: [],
+  productos: [],
+  empleados: []
+};
+
+function loadDB(){ try{ const s=localStorage.getItem('apexops_db'); if(s) DB=JSON.parse(s); }catch(e){} }
+function saveDB(){ localStorage.setItem('apexops_db',JSON.stringify(DB)); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function fmt(n){ return '$'+(+n||0).toLocaleString('es',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtN(n){ return '$'+Math.round(+n||0).toLocaleString('es'); }
+function pct(a,b){ return b>0?Math.round(a/b*100):0; }
+function notify(msg,type='ok'){ const d=document.createElement('div'); d.className='notif '+type; d.textContent=msg; document.getElementById('notify').appendChild(d); setTimeout(()=>d.remove(),3000); }
+
+// ============================================================
+// AUTH
+// ============================================================
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value.trim();
+  if(u==='admin@apexops.ai'&&p==='admin123'||u==='demo'&&p==='demo'){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='flex';
+    loadDB(); initMesSel(); buildLocalBtns(); renderDashboard();
+    setTodayDates();
+  } else { document.getElementById('lerr').textContent='Usuario o contraseña incorrectos'; }
+}
+function logout(){ document.getElementById('login').style.display='flex'; document.getElementById('app').style.display='none'; }
+
+function setTodayDates(){
+  const hoy=new Date().toISOString().split('T')[0];
+  ['v-fecha','g-fecha','m-fecha'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=hoy; });
+}
+
+// ============================================================
+// MES SELECTOR
+// ============================================================
+function initMesSel(){
+  const sel=document.getElementById('mes-sel');
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const now=new Date(); sel.innerHTML='';
+  for(let i=0;i<6;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const val=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const opt=document.createElement('option'); opt.value=val;
+    opt.textContent=meses[d.getMonth()]+' '+d.getFullYear();
+    if(i===0) opt.selected=true;
+    sel.appendChild(opt);
+  }
+}
+function getMesSel(){ return document.getElementById('mes-sel').value; }
+function filtrarMes(arr,campoFecha){ const m=getMesSel(); return arr.filter(x=>x[campoFecha]&&x[campoFecha].startsWith(m)); }
+
+// ============================================================
+// LOCAL BUTTONS
+// ============================================================
+let activeLocal = null;
+function buildLocalBtns(){
+  const wrap=document.getElementById('local-btns'); wrap.innerHTML='';
+  const all=[{id:null,name:'Todos',color:'#1a7fd4'},...DB.locales];
+  all.forEach(l=>{
+    const b=document.createElement('button'); b.className='lbtn'+(l.id===activeLocal?' on':'');
+    if(l.id===activeLocal){b.style.background=l.color;b.style.borderColor=l.color;}
+    b.innerHTML=`<div class="ldot" style="background:${l.color}"></div>${l.name}`;
+    b.onclick=()=>selLocal(l.id,b,l.color);
+    wrap.appendChild(b);
+  });
+  fillLocalSelects();
+}
+function selLocal(id,btn,color){
+  activeLocal=id;
+  document.querySelectorAll('.lbtn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.borderColor='';});
+  btn.classList.add('on'); btn.style.background=color; btn.style.borderColor=color;
+  renderDashboard();
+  if(document.getElementById('tab-nomina').classList.contains('on')) renderNomina();
+}
+function fillLocalSelects(){
+  ['v-local','g-local','m-local','me-local'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel)return;
+    const cur=sel.value; sel.innerHTML='';
+    DB.locales.forEach(l=>{ const o=document.createElement('option'); o.value=l.id; o.textContent=l.name; sel.appendChild(o); });
+    if(cur) sel.value=cur;
+  });
+  fillProdSelect();
+}
+function fillProdSelect(){
+  const sel=document.getElementById('m-prod'); if(!sel)return;
+  sel.innerHTML=''; DB.productos.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=(p.emoji||'')+(p.nombre||p.name||''); sel.appendChild(o); });
+}
+
+// ============================================================
+// LOCALES CRUD
+// ============================================================
+function openModal(id,data=null){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+
+function saveLocal(){
+  const name=document.getElementById('ml-name').value.trim();
+  if(!name){notify('Escribe el nombre del local','err');return;}
+  const id=document.getElementById('ml-id').value||uid();
+  const obj={id,name,color:document.getElementById('ml-color').value,dir:document.getElementById('ml-dir').value,enc:document.getElementById('ml-enc').value,lim:parseFloat(document.getElementById('ml-lim').value)||0,emp:parseInt(document.getElementById('ml-emp').value)||0};
+  const idx=DB.locales.findIndex(l=>l.id===id);
+  if(idx>=0) DB.locales[idx]=obj; else DB.locales.push(obj);
+  saveDB(); buildLocalBtns(); renderLocalesTable(); closeModal('modal-local');
+  document.getElementById('ml-id').value=''; ['ml-name','ml-dir','ml-enc','ml-lim','ml-emp'].forEach(i=>document.getElementById(i).value='');
+  notify('Local guardado ✓');
+}
+function editLocal(id){
+  const l=DB.locales.find(x=>x.id===id); if(!l)return;
+  document.getElementById('modal-local-title').textContent='Editar local';
+  document.getElementById('ml-id').value=l.id;
+  document.getElementById('ml-name').value=l.name;
+  document.getElementById('ml-color').value=l.color;
+  document.getElementById('ml-dir').value=l.dir||'';
+  document.getElementById('ml-enc').value=l.enc||'';
+  document.getElementById('ml-lim').value=l.lim||'';
+  document.getElementById('ml-emp').value=l.emp||'';
+  openModal('modal-local');
+}
+function delLocal(id){ if(!confirm('¿Eliminar este local?'))return; DB.locales=DB.locales.filter(l=>l.id!==id); saveDB(); buildLocalBtns(); renderLocalesTable(); notify('Local eliminado'); }
+function renderLocalesTable(){
+  document.getElementById('tbody-locales').innerHTML=DB.locales.map(l=>`
+    <tr><td><div style="width:14px;height:14px;border-radius:50%;background:${l.color};display:inline-block"></div></td>
+    <td><b>${l.name}</b></td><td>${l.dir||'—'}</td><td>${l.enc||'—'}</td><td>${l.emp||0}</td>
+    <td style="color:var(--amber)">${l.lim?fmt(l.lim):'Sin límite'}</td>
+    <td><div class="tbl-actions"><button class="btn btn-gray" style="padding:3px 9px;font-size:11px" onclick="editLocal('${l.id}')">Editar</button><button class="btn btn-red" style="padding:3px 9px;font-size:11px" onclick="delLocal('${l.id}')">Eliminar</button></div></td></tr>`).join('')||'<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:20px">No hay locales — agrega el primero</td></tr>';
+}
+
+// ============================================================
+// PRODUCTOS CRUD
+// ============================================================
+function calcMargenProd(){
+  const p=parseFloat(document.getElementById('mp-precio').value)||0;
+  const c=parseFloat(document.getElementById('mp-costo').value)||0;
+  if(p>0){ const m=((p-c)/p*100).toFixed(1); const col=m>60?'#22c55e':m>40?'#f59e0b':'#f43f5e'; document.getElementById('mp-margen').value=m+'%'; document.getElementById('mp-margen').style.color=col; }
+  else document.getElementById('mp-margen').value='';
+}
+function saveProd(){
+  const name=document.getElementById('mp-name').value.trim();
+  if(!name){notify('Escribe el nombre del producto','err');return;}
+  const id=document.getElementById('mp-id').value||uid();
+  const precio=parseFloat(document.getElementById('mp-precio').value)||0;
+  const costo=parseFloat(document.getElementById('mp-costo').value)||0;
+  const obj={id,nombre:name,cat:document.getElementById('mp-cat').value,precio,costo,emoji:document.getElementById('mp-emoji').value||'📦',stock:parseInt(document.getElementById('mp-stock').value)||0};
+  const idx=DB.productos.findIndex(p=>p.id===id);
+  if(idx>=0) DB.productos[idx]=obj; else DB.productos.push(obj);
+  saveDB(); renderProdTable(); fillProdSelect(); closeModal('modal-prod');
+  document.getElementById('mp-id').value=''; ['mp-name','mp-precio','mp-costo','mp-emoji','mp-stock','mp-margen'].forEach(i=>document.getElementById(i).value='');
+  notify('Producto guardado ✓');
+}
+function editProd(id){
+  const p=DB.productos.find(x=>x.id===id); if(!p)return;
+  document.getElementById('modal-prod-title').textContent='Editar producto';
+  document.getElementById('mp-id').value=p.id;
+  document.getElementById('mp-name').value=p.nombre;
+  document.getElementById('mp-cat').value=p.cat;
+  document.getElementById('mp-precio').value=p.precio;
+  document.getElementById('mp-costo').value=p.costo;
+  document.getElementById('mp-emoji').value=p.emoji||'';
+  document.getElementById('mp-stock').value=p.stock||0;
+  calcMargenProd(); openModal('modal-prod');
+}
+function delProd(id){ if(!confirm('¿Eliminar producto?'))return; DB.productos=DB.productos.filter(p=>p.id!==id); saveDB(); renderProdTable(); notify('Producto eliminado'); }
+function renderProdTable(){
+  const prod=activeLocal ? DB.productos : DB.productos;
+  document.getElementById('tbody-prod').innerHTML=prod.map(p=>{
+    const m=p.precio>0?((p.precio-p.costo)/p.precio*100).toFixed(1):0;
+    const mc=m>60?'#22c55e':m>40?'#f59e0b':'#f43f5e';
+    return `<tr><td>${p.emoji||''} ${p.nombre}</td><td>${p.cat}</td><td style="color:var(--mint)">${fmt(p.precio)}</td><td style="color:var(--text2)">${fmt(p.costo)}</td><td style="color:${mc}">${m}%</td><td><div class="tbl-actions"><button class="btn btn-gray" style="padding:3px 9px;font-size:11px" onclick="editProd('${p.id}')">Editar</button><button class="btn btn-red" style="padding:3px 9px;font-size:11px" onclick="delProd('${p.id}')">Eliminar</button></div></td></tr>`;
+  }).join('')||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:20px">No hay productos — agrega el primero</td></tr>';
+  renderProdChart();
+}
+function renderProdChart(){
+  const ventas=filtrarMes(DB.ventas,'fecha');
+  // simple donut por categoría
+  const cats={}; DB.productos.forEach(p=>{ if(!cats[p.cat])cats[p.cat]=0; cats[p.cat]++; });
+  const labels=Object.keys(cats); const data=Object.values(cats);
+  const cols=['#1a7fd4','#0fb8c9','#818cf8','#f59e0b','#f43f5e'];
+  mkChart('prod-chart','doughnut',{labels,datasets:[{data,backgroundColor:cols.slice(0,labels.length),borderWidth:0}]},{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#14273d',borderColor:'#1f3a5f',borderWidth:1}}});
+  const topProd=document.getElementById('prod-top');
+  if(labels.length===0){topProd.innerHTML='<div style="color:var(--text3);font-size:11px;padding:8px">Agrega productos primero</div>';return;}
+  topProd.innerHTML=labels.map((l,i)=>`<div class="brow"><div class="brow-n">${l}</div><div class="brow-b"><div class="brow-f" style="width:${pct(data[i],Math.max(...data))*1}%;background:${cols[i]}"></div></div><div class="brow-v" style="color:${cols[i]}">${data[i]} prod.</div></div>`).join('');
+}
+
+// ============================================================
+// EMPLEADOS CRUD
+// ============================================================
+function saveEmp(){
+  const nombre=document.getElementById('me-nombre').value.trim();
+  if(!nombre){notify('Escribe el nombre','err');return;}
+  const localId=document.getElementById('me-local').value;
+  if(!localId){notify('Selecciona un local','err');return;}
+  const id=document.getElementById('me-id').value||uid();
+  const obj={id,nombre,rol:document.getElementById('me-rol').value,localId,salario:parseFloat(document.getElementById('me-salario').value)||0,tel:document.getElementById('me-tel').value,fechaIngreso:document.getElementById('me-fecha').value};
+  const idx=DB.empleados.findIndex(e=>e.id===id);
+  if(idx>=0) DB.empleados[idx]=obj; else DB.empleados.push(obj);
+  saveDB(); renderNomina(); closeModal('modal-emp');
+  document.getElementById('me-id').value=''; ['me-nombre','me-salario','me-tel','me-fecha'].forEach(i=>document.getElementById(i).value='');
+  notify('Empleado guardado ✓');
+}
+function editEmp(id){
+  const e=DB.empleados.find(x=>x.id===id); if(!e)return;
+  document.getElementById('modal-emp-title').textContent='Editar empleado';
+  document.getElementById('me-id').value=e.id;
+  document.getElementById('me-nombre').value=e.nombre;
+  document.getElementById('me-rol').value=e.rol;
+  document.getElementById('me-local').value=e.localId;
+  document.getElementById('me-salario').value=e.salario;
+  document.getElementById('me-tel').value=e.tel||'';
+  document.getElementById('me-fecha').value=e.fechaIngreso||'';
+  openModal('modal-emp');
+}
+function delEmp(id){ if(!confirm('¿Eliminar empleado?'))return; DB.empleados=DB.empleados.filter(e=>e.id!==id); saveDB(); renderNomina(); notify('Empleado eliminado'); }
+function renderNomina(){
+  const emps=activeLocal ? DB.empleados.filter(e=>e.localId===activeLocal) : DB.empleados;
+  const localNombre=(id)=>{ const l=DB.locales.find(x=>x.id===id); return l?l.name:'—'; };
+  const rC={Gerente:'#818cf8',Encargado:'#0fb8c9',Cajero:'#1a7fd4','Cajero/a':'#1a7fd4',Barista:'#f59e0b','Pastelero/a':'#22c55e','Heladero/a':'#22c55e',Ayudante:'#3a6080'};
+  document.getElementById('tbody-emp').innerHTML=emps.map(e=>`
+    <tr><td>${e.nombre}</td>
+    <td><span class="rpill" style="background:${(rC[e.rol]||'#3a6080')}22;color:${rC[e.rol]||'#7aa3c8'}">${e.rol}</span></td>
+    <td>${localNombre(e.localId)}</td>
+    <td style="color:var(--mint)">${fmt(e.salario)}</td>
+    <td><div class="tbl-actions"><button class="btn btn-gray" style="padding:3px 9px;font-size:11px" onclick="editEmp('${e.id}')">Editar</button><button class="btn btn-red" style="padding:3px 9px;font-size:11px" onclick="delEmp('${e.id}')">Eliminar</button></div></td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--text3);text-align:center;padding:16px">No hay empleados registrados</td></tr>';
+
+  const totalN=emps.reduce((a,e)=>a+e.salario,0);
+  const venMes=filtrarMes(DB.ventas,'fecha');
+  const totalV=venMes.reduce((a,v)=>a+(activeLocal&&v.localId!==activeLocal?0:(+v.total||0)),0);
+  const topL=DB.locales.reduce((a,l)=>{ const ns=DB.empleados.filter(e=>e.localId===l.id).reduce((s,e)=>s+e.salario,0); return ns>a.v?{n:l.name,v:ns}:a; },{n:'—',v:0});
+  document.getElementById('nom-kpis').innerHTML=`
+    <div class="kpi" style="--kc:#f59e0b"><div class="kl">Nómina total</div><div class="kv">${fmtN(totalN)}</div><div class="kc2 nt">${emps.length} empleados</div></div>
+    <div class="kpi" style="--kc:#1a7fd4"><div class="kl">Promedio/local</div><div class="kv">${DB.locales.length?fmtN(totalN/DB.locales.length):'$0'}</div><div class="kc2 nt">por local</div></div>
+    <div class="kpi" style="--kc:#22c55e"><div class="kl">% sobre ventas</div><div class="kv">${totalV?pct(totalN,totalV)+'%':'—'}</div><div class="kc2 up">meta &lt;22%</div></div>
+    <div class="kpi" style="--kc:#f43f5e"><div class="kl">Local más costoso</div><div class="kv" style="font-size:14px">${topL.n}</div><div class="kc2 wn">${fmtN(topL.v)}/mes</div></div>`;
+
+  if(DB.locales.length){
+    const nomPorLocal=DB.locales.map(l=>DB.empleados.filter(e=>e.localId===l.id).reduce((s,e)=>s+e.salario,0));
+    mkChart('nom-chart','bar',{labels:DB.locales.map(l=>l.name),datasets:[{label:'Nómina',data:nomPorLocal,backgroundColor:DB.locales.map(l=>l.color+'bb'),borderRadius:5,borderSkipped:false}]});
+    const venPorLocal=DB.locales.map(l=>{const v=venMes.filter(x=>x.localId===l.id);return v.reduce((a,x)=>a+(+x.total||0),0);});
+    document.getElementById('nom-pct').innerHTML=DB.locales.map((l,i)=>{const p2=venPorLocal[i]>0?pct(nomPorLocal[i],venPorLocal[i]):0;const c=p2<15?'#22c55e':p2<22?'#f59e0b':'#f43f5e';return`<div class="brow"><div class="brow-n">${l.name}</div><div class="brow-b"><div class="brow-f" style="width:${Math.min(p2*3,100)}%;background:${c}"></div></div><div class="brow-v" style="color:${c}">${p2}%</div></div>`;}).join('');
+  }
+}
+
+// ============================================================
+// VENTAS
+// ============================================================
+document.addEventListener('input',function(e){
+  if(['v-helados','v-cafe','v-pasteleria'].includes(e.target.id)){
+    const h=parseFloat(document.getElementById('v-helados').value)||0;
+    const c=parseFloat(document.getElementById('v-cafe').value)||0;
+    const p=parseFloat(document.getElementById('v-pasteleria').value)||0;
+    document.getElementById('v-total').textContent=fmt(h+c+p);
+  }
+  if(['m-cant','m-costo'].includes(e.target.id)){
+    const cant=parseFloat(document.getElementById('m-cant').value)||0;
+    const costo=parseFloat(document.getElementById('m-costo').value)||0;
+    document.getElementById('m-total').value=fmt(cant*costo);
+  }
+});
+function guardarVenta(){
+  const localId=document.getElementById('v-local').value;
+  if(!localId){notify('Selecciona un local','err');return;}
+  const fecha=document.getElementById('v-fecha').value;
+  const h=parseFloat(document.getElementById('v-helados').value)||0;
+  const c=parseFloat(document.getElementById('v-cafe').value)||0;
+  const p=parseFloat(document.getElementById('v-pasteleria').value)||0;
+  const total=h+c+p;
+  if(total<=0){notify('Ingresa al menos un monto','err');return;}
+  const obj={id:uid(),localId,fecha,helados:h,cafe:c,pasteleria:p,total};
+  DB.ventas.push(obj); saveDB(); renderVentasTable(); renderDashboard();
+  ['v-helados','v-cafe','v-pasteleria'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('v-total').textContent='$0.00';
+  notify('Venta registrada ✓');
+}
+function delVenta(id){ if(!confirm('¿Eliminar registro?'))return; DB.ventas=DB.ventas.filter(v=>v.id!==id); saveDB(); renderVentasTable(); renderDashboard(); notify('Registro eliminado'); }
+function renderVentasTable(){
+  const ventas=(activeLocal?DB.ventas.filter(v=>v.localId===activeLocal):DB.ventas).slice().reverse().slice(0,30);
+  const lnom=(id)=>{const l=DB.locales.find(x=>x.id===id);return l?l.name:'—';};
+  document.getElementById('tbody-ventas').innerHTML=ventas.map(v=>`<tr><td>${v.fecha}</td><td>${lnom(v.localId)}</td><td>${fmt(v.helados)}</td><td>${fmt(v.cafe)}</td><td>${fmt(v.pasteleria)}</td><td style="color:var(--mint);font-weight:600">${fmt(v.total)}</td><td><button class="btn btn-red" style="padding:2px 7px;font-size:10px" onclick="delVenta('${v.id}')">✕</button></td></tr>`).join('')||'<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:16px">Sin ventas registradas</td></tr>';
+}
+
+// ============================================================
+// GASTOS
+// ============================================================
+function guardarGasto(){
+  const localId=document.getElementById('g-local').value;
+  if(!localId){notify('Selecciona un local','err');return;}
+  const monto=parseFloat(document.getElementById('g-monto').value)||0;
+  if(monto<=0){notify('Ingresa un monto válido','err');return;}
+  const obj={id:uid(),localId,fecha:document.getElementById('g-fecha').value,cat:document.getElementById('g-cat').value,desc:document.getElementById('g-desc').value,monto};
+  DB.gastos.push(obj); saveDB(); renderGastosTable(); renderDashboard();
+  document.getElementById('g-monto').value=''; document.getElementById('g-desc').value='';
+  notify('Gasto registrado ✓');
+  // Alerta si supera límite
+  const local=DB.locales.find(l=>l.id===localId);
+  if(local&&local.lim>0){
+    const mes=getMesSel();
+    const totalG=DB.gastos.filter(g=>g.localId===localId&&g.fecha.startsWith(mes)).reduce((a,g)=>a+g.monto,0);
+    if(totalG>local.lim) notify(`⚠ ${local.name} superó el límite de gasto!`,'err');
+  }
+}
+function delGasto(id){ if(!confirm('¿Eliminar gasto?'))return; DB.gastos=DB.gastos.filter(g=>g.id!==id); saveDB(); renderGastosTable(); renderDashboard(); }
+function renderGastosTable(){
+  const gastos=(activeLocal?DB.gastos.filter(g=>g.localId===activeLocal):DB.gastos).slice().reverse().slice(0,30);
+  const lnom=(id)=>{const l=DB.locales.find(x=>x.id===id);return l?l.name:'—';};
+  document.getElementById('tbody-gastos').innerHTML=gastos.map(g=>`<tr><td>${g.fecha}</td><td>${lnom(g.localId)}</td><td>${g.cat}</td><td>${g.desc||'—'}</td><td style="color:var(--rose)">${fmt(g.monto)}</td><td><button class="btn btn-red" style="padding:2px 7px;font-size:10px" onclick="delGasto('${g.id}')">✕</button></td></tr>`).join('')||'<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:16px">Sin gastos registrados</td></tr>';
+}
+
+// ============================================================
+// MERMAS
+// ============================================================
+function guardarMerma(){
+  const localId=document.getElementById('m-local').value;
+  if(!localId){notify('Selecciona un local','err');return;}
+  const prodId=document.getElementById('m-prod').value;
+  const cant=parseFloat(document.getElementById('m-cant').value)||0;
+  const costo=parseFloat(document.getElementById('m-costo').value)||0;
+  if(cant<=0){notify('Ingresa cantidad','err');return;}
+  const prod=DB.productos.find(p=>p.id===prodId);
+  const obj={id:uid(),localId,fecha:document.getElementById('m-fecha').value,prodId,prodNombre:prod?prod.nombre:'Producto',causa:document.getElementById('m-causa').value,cant,costo,total:cant*costo};
+  DB.mermas.push(obj); saveDB(); renderMermasTable(); renderDashboard();
+  ['m-cant','m-costo','m-total'].forEach(i=>document.getElementById(i).value='');
+  notify('Merma registrada ✓');
+}
+function delMerma(id){ if(!confirm('¿Eliminar merma?'))return; DB.mermas=DB.mermas.filter(m=>m.id!==id); saveDB(); renderMermasTable(); renderDashboard(); }
+function renderMermasTable(){
+  const mermas=(activeLocal?DB.mermas.filter(m=>m.localId===activeLocal):DB.mermas).slice().reverse().slice(0,20);
+  const lnom=(id)=>{const l=DB.locales.find(x=>x.id===id);return l?l.name:'—';};
+  document.getElementById('tbody-mermas').innerHTML=mermas.map(m=>`<tr><td>${m.fecha}</td><td>${lnom(m.localId)}</td><td>${m.prodNombre}</td><td>${m.causa}</td><td>${m.cant}</td><td style="color:var(--rose)">${fmt(m.total)}</td><td><button class="btn btn-red" style="padding:2px 7px;font-size:10px" onclick="delMerma('${m.id}')">✕</button></td></tr>`).join('')||'<tr><td colspan="7" style="color:var(--text3);text-align:center;padding:16px">Sin mermas registradas</td></tr>';
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+let charts={};
+function mkChart(id,type,data,opts){
+  if(charts[id]){try{charts[id].destroy();}catch(e){}}
+  const el=document.getElementById(id); if(!el)return;
+  const defOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#14273d',borderColor:'#1f3a5f',borderWidth:1,titleColor:'#ddeeff',bodyColor:'#7aa3c8',cornerRadius:5,mode:'index',intersect:false}},scales:{x:{grid:{color:'rgba(26,127,212,.1)'},ticks:{color:'#3a6080',font:{size:10}}},y:{grid:{color:'rgba(26,127,212,.1)'},ticks:{color:'#3a6080',font:{size:10},callback:v=>'$'+v.toLocaleString()}}}};
+  charts[id]=new Chart(el,{type,data,options:opts||defOpts});
+}
+
+function renderDashboard(){
+  if(!document.getElementById('tab-dashboard').classList.contains('on')&&activeLocal===null) {}
+  const mes=getMesSel();
+  const venMes=filtrarMes(DB.ventas,'fecha');
+  const gasMes=filtrarMes(DB.gastos,'fecha');
+  const merMes=filtrarMes(DB.mermas,'fecha');
+  const filterL=(arr)=>activeLocal?arr.filter(x=>x.localId===activeLocal):arr;
+  const fV=filterL(venMes); const fG=filterL(gasMes); const fM=filterL(merMes);
+  const totalV=fV.reduce((a,v)=>a+(+v.total||0),0);
+  const totalG=fG.reduce((a,g)=>a+(+g.monto||0),0);
+  const totalN=activeLocal?DB.empleados.filter(e=>e.localId===activeLocal).reduce((s,e)=>s+e.salario,0):DB.empleados.reduce((s,e)=>s+e.salario,0);
+  const totalM=fM.reduce((a,m)=>a+(+m.total||0),0);
+  const util=totalV-totalG;
+  const margin=totalV>0?pct(util,totalV):0;
+
+  // KPIs
+  document.getElementById('db-kpis').innerHTML=`
+    <div class="kpi" style="--kc:#1a7fd4"><div class="kl">Ventas del mes</div><div class="kv">${fmtN(totalV)}</div><div class="kc2 ${totalV>0?'up':'nt'}">${DB.locales.length>0?pct(totalV,DB.locales.length*1000)+' registros':'sin datos'}</div></div>
+    <div class="kpi" style="--kc:#f43f5e"><div class="kl">Gastos del mes</div><div class="kv">${fmtN(totalG)}</div><div class="kc2 wn">${totalV>0?pct(totalG,totalV)+'% s/ventas':'sin datos'}</div></div>
+    <div class="kpi" style="--kc:#22c55e"><div class="kl">Utilidad neta</div><div class="kv">${fmtN(util)}</div><div class="kc2 ${util>=0?'up':'dn'}">Margen ${margin}%</div></div>
+    <div class="kpi" style="--kc:#f59e0b"><div class="kl">Nómina</div><div class="kv">${fmtN(totalN)}</div><div class="kc2 nt">${DB.empleados.length} empleados</div></div>
+    <div class="kpi" style="--kc:#818cf8"><div class="kl">Mermas</div><div class="kv">${fmtN(totalM)}</div><div class="kc2 ${totalM>0?'dn':'up'}">${totalV>0?pct(totalM,totalV)+'% s/ventas':'sin registros'}</div></div>`;
+
+  // Gráfico ventas por local (últimos meses)
+  if(DB.locales.length>0){
+    const now=new Date(); const mLabels=[]; const mKeys=[];
+    for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);mKeys.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);mLabels.push(['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]);}
+    const locFil=activeLocal?DB.locales.filter(l=>l.id===activeLocal):DB.locales;
+    mkChart('db-cv','line',{labels:mLabels,datasets:locFil.map(l=>({label:l.name,data:mKeys.map(mk2=>DB.ventas.filter(v=>v.localId===l.id&&v.fecha.startsWith(mk2)).reduce((a,v)=>a+(+v.total||0),0)),borderColor:l.color,tension:0.4,pointRadius:3,pointBackgroundColor:l.color,fill:false}))});
+    document.getElementById('db-leg').innerHTML=locFil.map(l=>`<div class="li"><div class="ld" style="background:${l.color}"></div>${l.name}</div>`).join('');
+    const vtend=totalV>0?'+datos reales':'sin ventas aún';
+    document.getElementById('db-vtend').textContent=vtend;
+
+    // Ventas vs Gastos por local
+    mkChart('db-vg','bar',{labels:DB.locales.map(l=>l.name),datasets:[
+      {label:'Ventas',data:DB.locales.map(l=>venMes.filter(v=>v.localId===l.id).reduce((a,v)=>a+(+v.total||0),0)),backgroundColor:DB.locales.map(l=>l.color+'99'),borderRadius:3},
+      {label:'Gastos',data:DB.locales.map(l=>gasMes.filter(g=>g.localId===l.id).reduce((a,g)=>a+(+g.monto||0),0)),backgroundColor:'rgba(244,63,94,.5)',borderRadius:3}
+    ]});
+
+    // Ranking
+    const sorted=[...DB.locales].map(l=>{const v=venMes.filter(x=>x.localId===l.id).reduce((a,x)=>a+(+x.total||0),0);const g=gasMes.filter(x=>x.localId===l.id).reduce((a,x)=>a+(+x.monto||0),0);return{...l,v,g,m:v>0?pct(v-g,v):0};}).sort((a,b)=>b.m-a.m);
+    const medals=['🥇','🥈','🥉','4','5','6','7','8'];
+    document.getElementById('db-rank').innerHTML=sorted.length?sorted.map((l,i)=>`<div class="rank-row"><div class="rank-n" style="background:${l.color}22;color:${l.color}">${medals[i]}</div><div class="rank-info"><div class="rank-name">${l.name}</div><div class="rank-sub">${fmtN(l.v)} ventas</div><div class="rank-bar"><div class="rank-fill" style="width:${l.m}%;background:${l.color}"></div></div></div><div style="font-size:13px;font-weight:700;color:${l.m>55?'#22c55e':l.m>40?'#f59e0b':'#f43f5e'}">${l.m}%</div></div>`).join(''):'<div style="color:var(--text3);font-size:11px;padding:12px">Agrega locales y ventas para ver el ranking</div>';
+
+    // Mermas por local
+    const maxM=Math.max(...DB.locales.map(l=>merMes.filter(m=>m.localId===l.id).reduce((a,m)=>a+(+m.total||0),0)),1);
+    document.getElementById('db-mermas').innerHTML=DB.locales.map(l=>{const mv=merMes.filter(m=>m.localId===l.id).reduce((a,m)=>a+(+m.total||0),0);const c=mv>maxM*.6?'#f43f5e':mv>maxM*.3?'#f59e0b':'#22c55e';return`<div class="brow"><div class="brow-n">${l.name}</div><div class="brow-b"><div class="brow-f" style="width:${pct(mv,maxM)}%;background:${c}"></div></div><div class="brow-v" style="color:${c}">${fmtN(mv)}</div></div>`;}).join('');
+    const totalMermas=merMes.reduce((a,m)=>a+(+m.total||0),0);
+    document.getElementById('db-merma-bdg').textContent=fmtN(totalMermas)+' total';
+
+    // Top productos
+    const prodCounts={};
+    venMes.forEach(v=>{['helados','cafe','pasteleria'].forEach(k=>{if(v[k]>0){if(!prodCounts[k])prodCounts[k]=0;prodCounts[k]+=v[k];}});});
+    const cats=[{k:'helados',n:'Helados'},{k:'cafe',n:'Café'},{k:'pasteleria',n:'Pastelería'}];
+    const maxP=Math.max(...cats.map(c=>prodCounts[c.k]||0),1);
+    document.getElementById('db-top-prod').innerHTML=cats.map(c=>`<div class="brow"><div class="brow-n">${c.n}</div><div class="brow-b"><div class="brow-f" style="width:${pct(prodCounts[c.k]||0,maxP)*1}%;background:#1a7fd4"></div></div><div class="brow-v" style="color:#1a7fd4">${fmtN(prodCounts[c.k]||0)}</div></div>`).join('');
+  } else {
+    document.getElementById('db-kpis').innerHTML='<div style="grid-column:1/-1;color:var(--text3);text-align:center;padding:20px;font-size:13px">👆 Empieza agregando tus locales — clic en <b style="color:var(--blue)">+ Agregar local</b> arriba</div>';
+    document.getElementById('db-rank').innerHTML='<div style="color:var(--text3);font-size:11px;padding:12px">Sin locales aún</div>';
+  }
+}
+
+// ============================================================
+// PROYECCIÓN
+// ============================================================
+function calcProj(){
+  const crec=parseFloat(document.getElementById('sl-c').value)/100;
+  const red=parseFloat(document.getElementById('sl-r').value)/100;
+  const esc=parseFloat(document.getElementById('sl-e').value);
+  document.getElementById('sv-c').textContent=(crec*100).toFixed(1)+'%';
+  document.getElementById('sv-r').textContent=(red*100).toFixed(1)+'%';
+  const venMes=filtrarMes(DB.ventas,'fecha');
+  const gasMes=filtrarMes(DB.gastos,'fecha');
+  const baseV=Math.max(venMes.reduce((a,v)=>a+(+v.total||0),0),1000);
+  const baseG=Math.max(gasMes.reduce((a,g)=>a+(+g.monto||0),0)+DB.empleados.reduce((s,e)=>s+e.salario,0),500);
+  const ms=Array.from({length:12},(_,i)=>({v:Math.round(baseV*Math.pow(1+crec,i+1)*esc),g:Math.round(baseG*Math.pow(1-red,i+1)*esc)}));
+  document.getElementById('pm1').textContent=fmtN(ms[0].v);
+  document.getElementById('pm3').textContent=fmtN(ms[2].v);
+  document.getElementById('pm6').textContent=fmtN(ms[5].v);
+  document.getElementById('pm12').textContent=fmtN(ms[11].v);
+  document.getElementById('p3').textContent=fmtN(ms.slice(0,3).reduce((a,m)=>a+m.v,0));
+  document.getElementById('p6').textContent=fmtN(ms.slice(0,6).reduce((a,m)=>a+m.v,0));
+  document.getElementById('p12').textContent=fmtN(ms.reduce((a,m)=>a+m.v,0));
+  mkChart('proj-chart','line',{labels:Array.from({length:12},(_,i)=>'M'+(i+1)),datasets:[
+    {label:'Ventas',data:ms.map(m=>m.v),borderColor:'#818cf8',tension:0.4,pointRadius:2,backgroundColor:'rgba(129,140,248,.07)',fill:true},
+    {label:'Gastos',data:ms.map(m=>m.g),borderColor:'#f43f5e',tension:0.4,pointRadius:2,borderDash:[5,3]},
+    {label:'Utilidad',data:ms.map(m=>m.v-m.g),borderColor:'#22c55e',tension:0.4,pointRadius:2,backgroundColor:'rgba(34,197,94,.06)',fill:true}
+  ]});
+}
+
+// ============================================================
+// DIAGNÓSTICO
+// ============================================================
+function renderDiag(){
+  const venMes=filtrarMes(DB.ventas,'fecha');
+  const gasMes=filtrarMes(DB.gastos,'fecha');
+  const merMes=filtrarMes(DB.mermas,'fecha');
+  const diags=[];let crit=0,alrt=0,oks=0;
+  if(DB.locales.length===0){diags.push({i:'ℹ️',t:'info',title:'Comienza configurando tus locales',desc:'Ve a la pestaña "Locales" y agrega tu matriz y cada local para empezar a ver el diagnóstico.',bg:'rgba(26,127,212,.08)',bc:'rgba(26,127,212,.25)'});} 
+  else {
+    DB.locales.forEach(l=>{
+      const v=venMes.filter(x=>x.localId===l.id).reduce((a,x)=>a+(+x.total||0),0);
+      const g=gasMes.filter(x=>x.localId===l.id).reduce((a,x)=>a+(+x.monto||0),0);
+      const n=DB.empleados.filter(e=>e.localId===l.id).reduce((s,e)=>s+e.salario,0);
+      const m=v>0?pct(v-g,v):0;
+      const np=v>0?pct(n,v):0;
+      if(v===0){alrt++;diags.push({i:'🟡',t:'alerta',title:`${l.name} — Sin ventas registradas`,desc:'No hay ventas en el período seleccionado. Registra las ventas en "Ingresar datos".',bg:'rgba(245,158,11,.07)',bc:'rgba(245,158,11,.22)'});}
+      else if(m<40){crit++;diags.push({i:'🔴',t:'critico',title:`${l.name} — Margen crítico (${m}%)`,desc:`Los gastos representan el ${100-m}% de las ventas. Revisar costos urgente.`,bg:'rgba(244,63,94,.08)',bc:'rgba(244,63,94,.25)'});}
+      else if(m<55){alrt++;diags.push({i:'🟡',t:'alerta',title:`${l.name} — Margen bajo (${m}%)`,desc:`Margen por debajo del objetivo (>55%). Evaluar reducción de gastos o ajuste de precios.`,bg:'rgba(245,158,11,.07)',bc:'rgba(245,158,11,.22)'});}
+      else{oks++;diags.push({i:'🟢',t:'ok',title:`${l.name} — Margen saludable (${m}%)`,desc:`Buena rentabilidad. ${np>0?'Nómina: '+np+'% sobre ventas.':''}`,bg:'rgba(34,197,94,.07)',bc:'rgba(34,197,94,.22)'});}
+      if(l.lim>0&&g>l.lim){crit++;diags.push({i:'🔴',t:'critico',title:`${l.name} — Superó límite de gasto`,desc:`Gastó ${fmt(g)} de un límite de ${fmt(l.lim)} (${pct(g,l.lim)}%).`,bg:'rgba(244,63,94,.08)',bc:'rgba(244,63,94,.25)'});}
+    });
+    const totalM=merMes.reduce((a,m)=>a+(+m.total||0),0);
+    const totalV=venMes.reduce((a,v)=>a+(+v.total||0),0);
+    if(totalM>0&&totalV>0&&pct(totalM,totalV)>5){alrt++;diags.push({i:'🟡',t:'alerta',title:`Mermas altas — ${pct(totalM,totalV)}% sobre ventas`,desc:`Total de mermas: ${fmt(totalM)}. El umbral recomendado es &lt;5%.`,bg:'rgba(245,158,11,.07)',bc:'rgba(245,158,11,.22)'});}
+  }
+  const score=Math.min(100,Math.max(0,50+(oks*15)-(crit*20)-(alrt*8)));
+  document.getElementById('d-alrt').textContent=crit+alrt;
+  document.getElementById('d-alrt-s').textContent=crit+' críticas, '+alrt+' medias';
+  document.getElementById('d-score').textContent=score+'/100';
+  if(crit>1){document.getElementById('d-est').textContent='ATENCIÓN';document.getElementById('d-est').style.color='var(--rose)';document.getElementById('d-est-s').textContent=crit+' locales en riesgo';}
+  else if(crit>0||alrt>2){document.getElementById('d-est').textContent='ALERTA';document.getElementById('d-est').style.color='var(--amber)';document.getElementById('d-est-s').className='kc2 wn';document.getElementById('d-est-s').textContent='Revisar alertas';}
+  else{document.getElementById('d-est').textContent='SALUDABLE';document.getElementById('d-est').style.color='var(--mint)';document.getElementById('d-est-s').className='kc2 up';document.getElementById('d-est-s').textContent=oks+' locales en óptimo';}
+  document.getElementById('d-list').innerHTML=diags.map(d=>`<div class="diag" style="background:${d.bg};border-color:${d.bc}"><div style="font-size:18px;flex-shrink:0">${d.i}</div><div><div class="diag-t">${d.title}</div><div class="diag-d">${d.desc}</div></div></div>`).join('');
+
+  if(DB.locales.length>0){
+    const now=new Date();const mLabels=[];const mKeys=[];
+    for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);mKeys.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);mLabels.push(['E','F','M','A','My','Jn','Jl','Ag','S','O','N','D'][d.getMonth()]);}
+    mkChart('d-chart','line',{labels:mLabels,datasets:DB.locales.map(l=>({label:l.name,data:mKeys.map(mk2=>{const v=DB.ventas.filter(x=>x.localId===l.id&&x.fecha.startsWith(mk2)).reduce((a,x)=>a+(+x.total||0),0);const g=DB.gastos.filter(x=>x.localId===l.id&&x.fecha.startsWith(mk2)).reduce((a,x)=>a+(+x.monto||0),0);return v>0?pct(v-g,v):null;}),borderColor:l.color,tension:0.4,pointRadius:3,fill:false,spanGaps:true}))},{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#14273d',borderColor:'#1f3a5f',borderWidth:1,titleColor:'#ddeeff',bodyColor:'#7aa3c8',cornerRadius:5}},scales:{x:{grid:{color:'rgba(26,127,212,.1)'},ticks:{color:'#3a6080',font:{size:10}}},y:{grid:{color:'rgba(26,127,212,.1)'},ticks:{color:'#3a6080',font:{size:10},callback:v=>v+'%'}}}});
+    document.getElementById('d-leg').innerHTML=DB.locales.map(l=>`<div class="li"><div class="ld" style="background:${l.color}"></div>${l.name}</div>`).join('');
+  }
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function goTab(v,btn){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.tn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+v).classList.add('on');
+  btn.classList.add('on');
+  setTimeout(()=>{
+    if(v==='dashboard') renderDashboard();
+    if(v==='ingresar'){renderVentasTable();renderGastosTable();renderMermasTable();}
+    if(v==='locales') renderLocalesTable();
+    if(v==='productos') renderProdTable();
+    if(v==='nomina') renderNomina();
+    if(v==='proyeccion') calcProj();
+    if(v==='diagnostico') renderDiag();
+  },40);
+}
+</script>
+</body>
+</html>
