@@ -3,29 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexOps AI - POS Multi-Local</title>
+    <title>ApexOps AI - POS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; min-height: 100vh; }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
-        /* HEADER */
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h2 { text-align: center; margin-bottom: 30px; color: #667eea; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover { background: #5568d3; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border-left: 4px solid;
+            display: none;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border-color: #ff6b6b;
+            color: #721c24;
+        }
+        
+        .alert.show { display: block; }
+        
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -33,25 +85,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .header h1 {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .header-info {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .header-info span {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
+        
+        .header h1 { font-size: 24px; font-weight: bold; }
+        .header-info { display: flex; gap: 20px; align-items: center; }
+        .header-info span { font-size: 14px; opacity: 0.9; }
+        
         .btn-logout {
             background: #ff6b6b;
             border: none;
@@ -61,19 +100,16 @@
             cursor: pointer;
             font-size: 12px;
         }
-
-        .btn-logout:hover {
-            background: #ff5252;
-        }
-
-        /* NAVEGACIÓN PRINCIPAL */
+        
+        .btn-logout:hover { background: #ff5252; }
+        
         .nav-main {
             background: #f8f9fa;
             border-bottom: 1px solid #ddd;
             display: flex;
             gap: 0;
         }
-
+        
         .nav-btn {
             flex: 1;
             padding: 15px;
@@ -87,126 +123,25 @@
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
         }
-
-        .nav-btn:hover {
-            background: #eee;
-        }
-
-        .nav-btn.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        /* CONTENIDO */
-        .content {
-            padding: 20px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.show {
-            display: block;
-        }
-
-        /* LOGIN */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .login-box h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #667eea;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background: #5568d3;
-        }
-
-        .btn-primary {
-            background: #667eea;
-        }
-
-        .btn-secondary {
-            background: #999;
-        }
-
-        .btn-danger {
-            background: #ff6b6b;
-        }
-
-        .btn-success {
-            background: #51cf66;
-        }
-
-        .btn.full {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        /* GRID DE PRODUCTOS */
+        
+        .nav-btn:hover { background: #eee; }
+        .nav-btn.active { color: #667eea; border-bottom-color: #667eea; background: #f0f4ff; }
+        
+        .content { padding: 20px; }
+        .page { display: none; }
+        .page.show { display: block; }
+        
+        .loading { text-align: center; padding: 20px; color: #999; }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .productos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 10px;
             margin-bottom: 20px;
         }
-
+        
         .producto-btn {
             padding: 15px 10px;
             background: #f8f9fa;
@@ -217,37 +152,27 @@
             text-align: center;
             font-size: 12px;
         }
-
+        
         .producto-btn:hover {
             border-color: #667eea;
             background: #f0f4ff;
         }
-
-        .producto-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .producto-nombre {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .producto-precio {
-            color: #51cf66;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        /* CARRITO */
+        
+        .producto-nombre { font-weight: 500; margin-bottom: 5px; }
+        .producto-precio { color: #51cf66; font-weight: bold; font-size: 14px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        table thead { background: #f8f9fa; }
+        table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        table th { font-weight: 600; }
+        
         .carrito-section {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 4px;
             margin-top: 20px;
         }
-
+        
         .carrito-item {
             display: flex;
             justify-content: space-between;
@@ -256,49 +181,8 @@
             background: white;
             margin-bottom: 10px;
             border-radius: 4px;
-            border-left: 3px solid #667eea;
         }
-
-        .carrito-item-info {
-            flex: 1;
-        }
-
-        .carrito-item-nombre {
-            font-weight: 500;
-        }
-
-        .carrito-item-cantidad {
-            color: #666;
-            font-size: 12px;
-        }
-
-        .carrito-item-total {
-            font-weight: bold;
-            color: #51cf66;
-            min-width: 80px;
-            text-align: right;
-        }
-
-        .carrito-controls {
-            display: flex;
-            gap: 5px;
-        }
-
-        .carrito-controls button {
-            background: #ddd;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .carrito-controls button:hover {
-            background: #ccc;
-        }
-
-        /* RESUMEN */
+        
         .resumen {
             background: white;
             padding: 15px;
@@ -306,14 +190,14 @@
             border-radius: 4px;
             margin-top: 20px;
         }
-
+        
         .resumen-linea {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
         }
-
+        
         .resumen-linea.total {
             border-bottom: none;
             font-weight: bold;
@@ -323,601 +207,165 @@
             padding-top: 10px;
             border-top: 2px solid #eee;
         }
-
-        /* TABLAS */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        table thead {
-            background: #f8f9fa;
-        }
-
-        table th,
-        table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        table th {
-            font-weight: 600;
-            color: #333;
-        }
-
-        table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-        }
-
-        .modal.show {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 15px;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .close-modal:hover {
-            color: #000;
-        }
-
-        /* ALERTAS */
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            border-left: 4px solid;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            border-color: #51cf66;
-            color: #155724;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            border-color: #ff6b6b;
-            color: #721c24;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            border-color: #ffc107;
-            color: #856404;
-        }
-
-        /* RESPONSIVO */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .nav-main {
-                flex-wrap: wrap;
-            }
-
-            .nav-btn {
-                flex: 0 1 48%;
-            }
-
-            .productos-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-
-            .modal-content {
-                width: 95%;
-                max-height: 90vh;
-            }
-        }
-
-        /* SPINNER LOADING */
-        .spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .estado-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .estado-pendiente {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .estado-recibida {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .estado-activa {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .estado-anulada {
-            background: #f8d7da;
-            color: #721c24;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- LOGIN PAGE -->
-        <div id="loginPage" class="page show">
-            <div class="login-container">
-                <div class="login-box">
-                    <h2>🛒 ApexOps AI - POS</h2>
-                    <div id="loginError" class="alert alert-error" style="display:none;"></div>
-                    
-                    <div class="form-group">
-                        <label>Seleccionar Local</label>
-                        <select id="selectLocal">
-                            <option value="">-- Selecciona tu local --</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Usuario</label>
-                        <input type="text" id="usuario" placeholder="Tu usuario">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Contraseña</label>
-                        <input type="password" id="password" placeholder="Tu contraseña">
-                    </div>
-
-                    <button class="btn full" onclick="login()">Ingresar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN APP -->
-        <div id="mainApp" style="display:none;">
-            <!-- HEADER -->
-            <div class="header">
-                <h1>🛒 ApexOps AI - POS Multi-Local</h1>
-                <div class="header-info">
-                    <span id="headerLocal">Local: -</span>
-                    <span id="headerUsuario">Usuario: -</span>
-                    <span id="headerHora">-</span>
-                    <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
-                </div>
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h2>🛒 ApexOps AI - POS</h2>
+            <div id="loginError" class="alert alert-error"></div>
+            
+            <div class="form-group">
+                <label>Seleccionar Local</label>
+                <select id="selectLocal">
+                    <option value="">-- Cargando locales --</option>
+                </select>
             </div>
 
-            <!-- NAVEGACIÓN -->
-            <div class="nav-main">
-                <button class="nav-btn active" onclick="irPos()">📦 POS Facturación</button>
-                <button class="nav-btn" onclick="irCaja()">💰 Control Caja</button>
-                <button class="nav-btn" onclick="irReportes()">📊 Reportes</button>
-                <button class="nav-btn" onclick="irProductos()">🏷️ Productos</button>
-                <button class="nav-btn" onclick="irGuias()">📋 Guías de Producto</button>
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="usuario" placeholder="Tu usuario">
             </div>
 
-            <!-- CONTENIDO -->
-            <div class="content">
-                <!-- POS FACTURACIÓN -->
-                <div id="posPage" class="page show">
-                    <h2>📦 Sistema de Venta</h2>
-                    
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px;">
-                        <!-- IZQUIERDA: PRODUCTOS -->
-                        <div>
-                            <h3>Productos Disponibles</h3>
-                            <div id="categoriasContainer"></div>
-                            <div id="productosGrid" class="productos-grid"></div>
-                        </div>
-
-                        <!-- DERECHA: CARRITO -->
-                        <div>
-                            <h3>Carrito de Compra</h3>
-                            <div id="carritoContainer" class="carrito-section">
-                                <div id="carritoVacio" style="text-align: center; padding: 20px; color: #999;">
-                                    Carrito vacío
-                                </div>
-                                <div id="carritoItems"></div>
-                            </div>
-
-                            <!-- CLIENTE -->
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
-                                <h4>Datos del Cliente</h4>
-                                <div class="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" id="clienteNombre" value="CONSUMIDOR FINAL" placeholder="Cliente">
-                                </div>
-                                <div class="form-group">
-                                    <label>Email (Opcional)</label>
-                                    <input type="email" id="clienteEmail" placeholder="email@ejemplo.com">
-                                </div>
-                            </div>
-
-                            <!-- MÉTODO DE PAGO -->
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 15px;">
-                                <h4>Método de Pago</h4>
-                                <div class="form-group">
-                                    <select id="metodoPago">
-                                        <option value="Efectivo">💵 Efectivo</option>
-                                        <option value="Transferencia">🏦 Transferencia</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- RESUMEN -->
-                            <div class="resumen">
-                                <div class="resumen-linea">
-                                    <span>Subtotal:</span>
-                                    <span id="subtotalSpan">$0.00</span>
-                                </div>
-                                <div class="resumen-linea">
-                                    <span>Descuento:</span>
-                                    <input type="number" id="descuentoInput" placeholder="0" style="width: 80px;" onchange="actualizarResumen()">
-                                </div>
-                                <div class="resumen-linea total">
-                                    <span>TOTAL:</span>
-                                    <span id="totalSpan">$0.00</span>
-                                </div>
-                            </div>
-
-                            <button class="btn full btn-success" onclick="generarVenta()">✓ Generar Venta</button>
-                            <button class="btn full btn-secondary" onclick="limpiarCarrito()">🔄 Limpiar Carrito</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CONTROL DE CAJA -->
-                <div id="cajaPage" class="page">
-                    <h2>💰 Control de Caja</h2>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-                        <!-- APERTURA CAJA -->
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 4px;">
-                            <h3>Abrir Caja</h3>
-                            <div class="form-group">
-                                <label>Saldo Inicial (Efectivo)</label>
-                                <input type="number" id="cajaInicial" placeholder="0.00" step="0.01">
-                            </div>
-                            <button class="btn" onclick="abrirCaja()">Abrir Caja</button>
-                        </div>
-
-                        <!-- ESTADO ACTUAL -->
-                        <div style="background: #f0f4ff; padding: 20px; border-radius: 4px;">
-                            <h3>Estado Actual</h3>
-                            <div id="estadoCaja">
-                                <p>No hay caja abierta</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CIERRE DE CAJA -->
-                    <div style="margin-top: 30px;">
-                        <h3>Cerrar Caja</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Concepto</th>
-                                    <th>Monto</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Saldo Inicial</td>
-                                    <td id="cierreSaldoInicial">$0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>Ventas en Efectivo</td>
-                                    <td id="cierreVentasEfectivo">$0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>Total Esperado</td>
-                                    <td id="cierreTotalEsperado">$0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <label>Total Contado</label>
-                                        <input type="number" id="cierreTotalContado" placeholder="0.00" step="0.01" style="width: 150px; margin-top: 5px;">
-                                    </td>
-                                    <td id="cierreDiferencia">$0.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <button class="btn btn-success" onclick="cerrarCaja()">Cerrar Caja</button>
-                    </div>
-                </div>
-
-                <!-- REPORTES -->
-                <div id="reportesPage" class="page">
-                    <h2>📊 Reportes</h2>
-                    
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>Fecha Desde</label>
-                                <input type="date" id="reporteFechaDesde">
-                            </div>
-                            <div class="form-group">
-                                <label>Fecha Hasta</label>
-                                <input type="date" id="reporteFechaHasta">
-                            </div>
-                            <div style="display: flex; align-items: flex-end;">
-                                <button class="btn" onclick="cargarReportes()">Filtrar</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3>Ventas del Período</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Factura #</th>
-                                <th>Cliente</th>
-                                <th>Pago</th>
-                                <th>Total</th>
-                                <th>Usuario</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportesTableBody">
-                            <tr><td colspan="6" style="text-align: center; color: #999;">Cargando...</td></tr>
-                        </tbody>
-                    </table>
-
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-top: 20px;">
-                        <h3>Resumen del Período</h3>
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-                            <div style="background: white; padding: 15px; border-radius: 4px; text-align: center;">
-                                <div style="font-size: 12px; color: #666;">Total Ventas</div>
-                                <div style="font-size: 24px; font-weight: bold; color: #51cf66;" id="resumenTotal">$0.00</div>
-                            </div>
-                            <div style="background: white; padding: 15px; border-radius: 4px; text-align: center;">
-                                <div style="font-size: 12px; color: #666;">Efectivo</div>
-                                <div style="font-size: 24px; font-weight: bold; color: #667eea;" id="resumenEfectivo">$0.00</div>
-                            </div>
-                            <div style="background: white; padding: 15px; border-radius: 4px; text-align: center;">
-                                <div style="font-size: 12px; color: #666;">Transferencias</div>
-                                <div style="font-size: 24px; font-weight: bold; color: #ffc107;" id="resumenTransferencias">$0.00</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PRODUCTOS (SOLO MATRIZ) -->
-                <div id="productosPage" class="page">
-                    <h2>🏷️ Gestión de Productos</h2>
-                    <div id="productosMatrizOnly" style="display:none;">
-                        <button class="btn btn-success" onclick="abrirModalNuevoProducto()">+ Nuevo Producto</button>
-                        
-                        <table style="margin-top: 20px;">
-                            <thead>
-                                <tr>
-                                    <th>Código</th>
-                                    <th>Nombre</th>
-                                    <th>Categoría</th>
-                                    <th>Precio</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productosTableBody">
-                                <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="productosNoMatriz" style="text-align: center; padding: 40px; color: #999;">
-                        ⚠️ Solo MATRIZ puede gestionar productos
-                    </div>
-                </div>
-
-                <!-- GUÍAS DE PRODUCTO -->
-                <div id="guiasPage" class="page">
-                    <h2>📋 Guías de Producto</h2>
-                    
-                    <div id="guiasMatrizSection" style="display:none;">
-                        <button class="btn btn-success" onclick="abrirModalNuevaGuia()">+ Nueva Guía</button>
-                        
-                        <h3 style="margin-top: 20px;">Guías Enviadas</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Guía #</th>
-                                    <th>Destino</th>
-                                    <th>Fecha Envío</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="guiasMatrizTableBody">
-                                <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div id="guiasLocalSection" style="display:none;">
-                        <h3>Guías Pendientes de Recibir</h3>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Guía #</th>
-                                    <th>Enviado por</th>
-                                    <th>Fecha Envío</th>
-                                    <th>Productos</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="guiasLocalTableBody">
-                                <tr><td colspan="6" style="text-align: center;">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="password" placeholder="Tu contraseña">
             </div>
+
+            <button class="btn" id="btnLogin" onclick="login()">Ingresar</button>
         </div>
     </div>
 
-    <!-- MODAL NUEVO PRODUCTO -->
-    <div id="modalProducto" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Nuevo Producto</h2>
-                <button class="close-modal" onclick="cerrarModal('modalProducto')">×</button>
+    <div id="mainApp" style="display:none;">
+        <div class="header">
+            <h1>🛒 ApexOps AI - POS</h1>
+            <div class="header-info">
+                <span id="headerLocal">-</span>
+                <span id="headerUsuario">-</span>
+                <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
             </div>
-            <div class="form-group">
-                <label>Código</label>
-                <input type="text" id="productoCodigoInput" placeholder="Ej: T10N">
-            </div>
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="productoNombreInput" placeholder="Ej: Torta 10 Personas">
-            </div>
-            <div class="form-group">
-                <label>Categoría</label>
-                <input type="text" id="productoCategoriaInput" placeholder="Ej: TORTAS">
-            </div>
-            <div class="form-group">
-                <label>Precio de Venta</label>
-                <input type="number" id="productoPrecioInput" placeholder="0.00" step="0.01">
-            </div>
-            <button class="btn full btn-success" onclick="guardarProducto()">Guardar Producto</button>
         </div>
-    </div>
 
-    <!-- MODAL NUEVA GUÍA -->
-    <div id="modalGuia" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Nueva Guía de Producto</h2>
-                <button class="close-modal" onclick="cerrarModal('modalGuia')">×</button>
+        <div class="nav-main">
+            <button class="nav-btn active" onclick="irPos()">📦 POS</button>
+            <button class="nav-btn" onclick="irReportes()">📊 Reportes</button>
+            <button class="nav-btn" onclick="irProductos()">🏷️ Productos</button>
+        </div>
+
+        <div class="content">
+            <div id="posPage" class="page show">
+                <h2>📦 Sistema de Venta</h2>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div>
+                        <h3>Productos Disponibles</h3>
+                        <div id="productosGrid" class="productos-grid">
+                            <div class="loading"><div class="spinner"></div> Cargando...</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>Carrito</h3>
+                        <div id="carritoContainer" class="carrito-section">
+                            <div id="carritoItems"></div>
+                        </div>
+
+                        <div class="resumen">
+                            <div class="resumen-linea">
+                                <span>Total:</span>
+                                <span id="totalSpan">$0.00</span>
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="generarVenta()" style="background: #51cf66;">✓ Generar Venta</button>
+                        <button class="btn" onclick="limpiarCarrito()" style="background: #999;">Limpiar</button>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Local Destino</label>
-                <select id="guiaLocalDestino"></select>
+
+            <div id="reportesPage" class="page">
+                <h2>📊 Reportes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Factura #</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportesTableBody">
+                        <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>Producto</label>
-                <select id="guiaProducto"></select>
+
+            <div id="productosPage" class="page">
+                <h2>🏷️ Gestión de Productos (Solo Matriz)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productosTableBody">
+                        <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label>Cantidad</label>
-                <input type="number" id="guiaCantidad" placeholder="0" step="0.01">
-            </div>
-            <div class="form-group">
-                <label>Lote (Opcional)</label>
-                <input type="text" id="guiaLote" placeholder="Código de lote">
-            </div>
-            <div class="form-group">
-                <label>Fecha Vencimiento (Opcional)</label>
-                <input type="date" id="guiaVencimiento">
-            </div>
-            <button class="btn full btn-success" onclick="guardarGuia()">Crear Guía</button>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN SUPABASE
         const SUPABASE_URL = 'https://kwuzffxcahzqpzfohlup.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3dXpmZnhjYWh6cXB6Zm9obHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MDIzNzMsImV4cCI6MjA4OTk3ODM3M30.6FVlmfIvqjsLt-i3SAvbcZUEIXkb2fcoyYngzwDgnc4';
-        
+
         const { createClient } = window.supabase;
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // VARIABLES GLOBALES
         let usuarioActual = null;
         let localActual = null;
         let carrito = [];
-        let categoriaActual = null;
-        let cajaActual = null;
+        let productos = [];
 
         // INICIALIZAR
-        document.addEventListener('DOMContentLoaded', async () => {
-            await cargarLocales();
-            actualizarHora();
-            setInterval(actualizarHora, 1000);
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarLocales();
         });
 
-        // CARGAR LOCALES EN LOGIN
         async function cargarLocales() {
             try {
+                console.log('Cargando locales...');
                 const { data, error } = await supabase
                     .from('pos_locales')
-                    .select('id, nombre')
+                    .select('id, nombre, es_matriz')
                     .eq('activo', true)
                     .order('es_matriz', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Error:', error);
+                    mostrarError('Error cargando locales: ' + error.message);
+                    return;
+                }
 
+                console.log('Locales cargados:', data);
                 const select = document.getElementById('selectLocal');
+                select.innerHTML = '<option value="">-- Selecciona tu local --</option>';
+                
                 data.forEach(local => {
                     const option = document.createElement('option');
                     option.value = local.id;
-                    option.textContent = local.nombre;
+                    option.textContent = local.nombre + (local.es_matriz ? ' (MATRIZ)' : '');
                     select.appendChild(option);
                 });
             } catch (error) {
-                console.error('Error cargando locales:', error);
+                console.error('Error:', error);
+                mostrarError('Error: ' + error.message);
             }
         }
 
-        // LOGIN
         async function login() {
             const localId = parseInt(document.getElementById('selectLocal').value);
             const usuario = document.getElementById('usuario').value.trim();
@@ -928,7 +376,10 @@
                 return;
             }
 
+            document.getElementById('btnLogin').disabled = true;
+
             try {
+                console.log('Intentando login...');
                 const { data, error } = await supabase
                     .from('pos_usuarios')
                     .select('*')
@@ -939,16 +390,16 @@
 
                 if (error || !data) {
                     mostrarError('Usuario o contraseña incorrectos');
+                    document.getElementById('btnLogin').disabled = false;
                     return;
                 }
 
-                // Verificar contraseña (simple, sin hash por ahora)
                 if (data.contraseña !== password) {
                     mostrarError('Usuario o contraseña incorrectos');
+                    document.getElementById('btnLogin').disabled = false;
                     return;
                 }
 
-                // Guardar sesión
                 usuarioActual = data;
                 const { data: local } = await supabase
                     .from('pos_locales')
@@ -958,194 +409,93 @@
 
                 localActual = local;
 
-                // Mostrar app principal
-                document.getElementById('loginPage').classList.remove('show');
+                document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-
-                // Actualizar header
                 document.getElementById('headerLocal').textContent = `Local: ${local.nombre}`;
                 document.getElementById('headerUsuario').textContent = `Usuario: ${usuarioActual.nombre}`;
 
-                // Cargar datos iniciales
                 await cargarProductos();
-                await cargarCajaActual();
                 await cargarReportes();
 
-                // Mostrar/ocultar opciones según local
-                if (local.es_matriz) {
-                    document.getElementById('productosMatrizOnly').style.display = 'block';
-                    document.getElementById('productosNoMatriz').style.display = 'none';
-                    document.getElementById('guiasMatrizSection').style.display = 'block';
-                    document.getElementById('guiasLocalSection').style.display = 'none';
-                } else {
-                    document.getElementById('productosMatrizOnly').style.display = 'none';
-                    document.getElementById('productosNoMatriz').style.display = 'block';
-                    document.getElementById('guiasMatrizSection').style.display = 'none';
-                    document.getElementById('guiasLocalSection').style.display = 'block';
-                }
-
             } catch (error) {
-                console.error('Error en login:', error);
-                mostrarError('Error al iniciar sesión');
+                console.error('Error:', error);
+                mostrarError('Error: ' + error.message);
+                document.getElementById('btnLogin').disabled = false;
             }
         }
 
-        // LOGOUT
-        function logout() {
-            if (confirm('¿Cerrar sesión?')) {
-                usuarioActual = null;
-                localActual = null;
-                carrito = [];
-                document.getElementById('loginPage').classList.add('show');
-                document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('usuario').value = '';
-                document.getElementById('password').value = '';
-            }
-        }
-
-        // CARGAR PRODUCTOS
         async function cargarProductos() {
             try {
                 const { data, error } = await supabase
                     .from('pos_productos')
                     .select('*')
                     .eq('activo', true)
-                    .order('categoria', { ascending: true })
-                    .order('nombre', { ascending: true });
+                    .order('nombre');
 
                 if (error) throw error;
 
-                // Agrupar por categoría
-                const categorias = {};
+                productos = data;
+                const grid = document.getElementById('productosGrid');
+                grid.innerHTML = '';
+
                 data.forEach(prod => {
-                    if (!categorias[prod.categoria]) {
-                        categorias[prod.categoria] = [];
-                    }
-                    categorias[prod.categoria].push(prod);
-                });
-
-                // Mostrar categorías
-                const categoriasContainer = document.getElementById('categoriasContainer');
-                categoriasContainer.innerHTML = '';
-
-                Object.keys(categorias).forEach(cat => {
                     const btn = document.createElement('button');
-                    btn.textContent = cat;
-                    btn.className = 'nav-btn';
-                    btn.onclick = () => mostrarCategoria(cat, categorias);
-                    categoriasContainer.appendChild(btn);
+                    btn.className = 'producto-btn';
+                    btn.innerHTML = `
+                        <div class="producto-nombre">${prod.codigo}</div>
+                        <div>${prod.nombre}</div>
+                        <div class="producto-precio">$${prod.precio_venta}</div>
+                    `;
+                    btn.onclick = () => agregarAlCarrito(prod);
+                    grid.appendChild(btn);
                 });
-
-                // Mostrar primera categoría
-                if (Object.keys(categorias).length > 0) {
-                    mostrarCategoria(Object.keys(categorias)[0], categorias);
-                }
-
-                // Llenar select de productos en guías
-                const selectGuiaProducto = document.getElementById('guiaProducto');
-                selectGuiaProducto.innerHTML = '';
-                data.forEach(prod => {
-                    const option = document.createElement('option');
-                    option.value = prod.id;
-                    option.textContent = `${prod.codigo} - ${prod.nombre} ($${prod.precio_venta})`;
-                    selectGuiaProducto.appendChild(option);
-                });
-
             } catch (error) {
-                console.error('Error cargando productos:', error);
+                console.error('Error:', error);
             }
         }
 
-        // MOSTRAR CATEGORÍA
-        function mostrarCategoria(categoria, categorias) {
-            categoriaActual = categoria;
-            const grid = document.getElementById('productosGrid');
-            grid.innerHTML = '';
-
-            categorias[categoria].forEach(prod => {
-                const btn = document.createElement('button');
-                btn.className = 'producto-btn';
-                btn.innerHTML = `
-                    <div class="producto-nombre">${prod.codigo}</div>
-                    <div>${prod.nombre}</div>
-                    <div class="producto-precio">$${prod.precio_venta}</div>
-                `;
-                btn.onclick = () => agregarAlCarrito(prod);
-                grid.appendChild(btn);
-            });
-        }
-
-        // AGREGAR AL CARRITO
         function agregarAlCarrito(producto) {
             const existente = carrito.find(item => item.id === producto.id);
-
             if (existente) {
                 existente.cantidad += 1;
             } else {
-                carrito.push({
-                    ...producto,
-                    cantidad: 1
-                });
+                carrito.push({ ...producto, cantidad: 1 });
             }
-
             actualizarCarrito();
         }
 
-        // ACTUALIZAR CARRITO
         function actualizarCarrito() {
             const container = document.getElementById('carritoItems');
-            const vacio = document.getElementById('carritoVacio');
-
             if (carrito.length === 0) {
-                container.innerHTML = '';
-                vacio.style.display = 'block';
-                actualizarResumen();
-                return;
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Carrito vacío</p>';
+            } else {
+                container.innerHTML = carrito.map((item, idx) => `
+                    <div class="carrito-item">
+                        <div style="flex: 1;">
+                            <strong>${item.nombre}</strong><br>
+                            <small>${item.codigo}</small>
+                        </div>
+                        <input type="number" value="${item.cantidad}" min="1" onchange="cambiarCantidad(${idx}, this.value)" style="width: 60px; padding: 5px;">
+                        <div style="min-width: 80px; text-align: right;"><strong>$${(item.precio_venta * item.cantidad).toFixed(2)}</strong></div>
+                        <button onclick="eliminarDelCarrito(${idx})" style="background: #ff6b6b; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">×</button>
+                    </div>
+                `).join('');
             }
 
-            vacio.style.display = 'none';
-            container.innerHTML = carrito.map((item, idx) => `
-                <div class="carrito-item">
-                    <div class="carrito-item-info">
-                        <div class="carrito-item-nombre">${item.nombre}</div>
-                        <div class="carrito-item-cantidad">${item.codigo}</div>
-                    </div>
-                    <div style="flex: 0 0 100px; text-align: center;">
-                        <input type="number" value="${item.cantidad}" min="1" onchange="cambiarCantidad(${idx}, this.value)" style="width: 60px; padding: 5px;">
-                    </div>
-                    <div class="carrito-item-total">$${(item.precio_venta * item.cantidad).toFixed(2)}</div>
-                    <div class="carrito-controls">
-                        <button onclick="eliminarDelCarrito(${idx})">−</button>
-                    </div>
-                </div>
-            `).join('');
-
-            actualizarResumen();
+            const total = carrito.reduce((sum, item) => sum + (item.precio_venta * item.cantidad), 0);
+            document.getElementById('totalSpan').textContent = `$${total.toFixed(2)}`;
         }
 
-        // CAMBIAR CANTIDAD
         function cambiarCantidad(idx, cantidad) {
             carrito[idx].cantidad = Math.max(1, parseInt(cantidad) || 1);
             actualizarCarrito();
         }
 
-        // ELIMINAR DEL CARRITO
         function eliminarDelCarrito(idx) {
             carrito.splice(idx, 1);
             actualizarCarrito();
         }
 
-        // ACTUALIZAR RESUMEN
-        function actualizarResumen() {
-            const subtotal = carrito.reduce((sum, item) => sum + (item.precio_venta * item.cantidad), 0);
-            const descuento = parseFloat(document.getElementById('descuentoInput').value) || 0;
-            const total = subtotal - descuento;
-
-            document.getElementById('subtotalSpan').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('totalSpan').textContent = `$${Math.max(0, total).toFixed(2)}`;
-        }
-
-        // GENERAR VENTA
         async function generarVenta() {
             if (carrito.length === 0) {
                 alert('El carrito está vacío');
@@ -1153,14 +503,8 @@
             }
 
             try {
-                const subtotal = carrito.reduce((sum, item) => sum + (item.precio_venta * item.cantidad), 0);
-                const descuento = parseFloat(document.getElementById('descuentoInput').value) || 0;
-                const total = subtotal - descuento;
-                const metodoPago = document.getElementById('metodoPago').value;
-                const clienteNombre = document.getElementById('clienteNombre').value;
-                const clienteEmail = document.getElementById('clienteEmail').value;
-
-                // Generar número de factura
+                const total = carrito.reduce((sum, item) => sum + (item.precio_venta * item.cantidad), 0);
+                
                 const { data: maxFactura } = await supabase
                     .from('pos_ventas')
                     .select('numero_factura')
@@ -1169,7 +513,6 @@
 
                 const numeroFactura = (maxFactura && maxFactura.length > 0 ? maxFactura[0].numero_factura + 1 : 1000);
 
-                // Insertar venta
                 const { data: venta, error: errorVenta } = await supabase
                     .from('pos_ventas')
                     .insert({
@@ -1177,13 +520,10 @@
                         local_id: localActual.id,
                         usuario_id: usuarioActual.id,
                         fecha_venta: new Date().toISOString().split('T')[0],
-                        hora_venta: new Date().toTimeString().split(' ')[0],
-                        cliente_nombre: clienteNombre,
-                        cliente_email: clienteEmail,
-                        subtotal: subtotal,
-                        descuento: descuento,
+                        cliente_nombre: 'CONSUMIDOR FINAL',
+                        subtotal: total,
                         total: total,
-                        metodo_pago: metodoPago,
+                        metodo_pago: 'Efectivo',
                         estado: 'activa'
                     })
                     .select()
@@ -1191,7 +531,6 @@
 
                 if (errorVenta) throw errorVenta;
 
-                // Insertar detalles de venta
                 const detalles = carrito.map(item => ({
                     venta_id: venta.id,
                     producto_id: item.id,
@@ -1206,513 +545,88 @@
 
                 if (errorDetalles) throw errorDetalles;
 
-                // Limpiar carrito
-                alert(`✓ Venta #${numeroFactura} generada con éxito!\nTotal: $${total.toFixed(2)}`);
+                alert(`✓ Venta #${numeroFactura} generada\nTotal: $${total.toFixed(2)}`);
                 limpiarCarrito();
                 await cargarReportes();
 
             } catch (error) {
-                console.error('Error generando venta:', error);
-                alert('Error al generar la venta');
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
             }
         }
 
-        // LIMPIAR CARRITO
         function limpiarCarrito() {
             carrito = [];
-            document.getElementById('clienteNombre').value = 'CONSUMIDOR FINAL';
-            document.getElementById('clienteEmail').value = '';
-            document.getElementById('descuentoInput').value = '';
-            document.getElementById('metodoPago').value = 'Efectivo';
             actualizarCarrito();
         }
 
-        // ABRIR CAJA
-        async function abrirCaja() {
-            const salarioInicial = parseFloat(document.getElementById('cajaInicial').value);
-
-            if (!salarioInicial || salarioInicial < 0) {
-                alert('Ingresa un saldo inicial válido');
-                return;
-            }
-
-            try {
-                const { data, error } = await supabase
-                    .from('pos_cajas')
-                    .insert({
-                        usuario_id: usuarioActual.id,
-                        local_id: localActual.id,
-                        fecha: new Date().toISOString().split('T')[0],
-                        saldo_inicial: salarioInicial,
-                        estado: 'abierta'
-                    })
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                cajaActual = data;
-                document.getElementById('cajaInicial').value = '';
-                await cargarCajaActual();
-                alert('✓ Caja abierta exitosamente');
-
-            } catch (error) {
-                console.error('Error abriendo caja:', error);
-                alert('Error al abrir la caja');
-            }
-        }
-
-        // CARGAR CAJA ACTUAL
-        async function cargarCajaActual() {
-            try {
-                const hoy = new Date().toISOString().split('T')[0];
-                const { data, error } = await supabase
-                    .from('pos_cajas')
-                    .select('*')
-                    .eq('usuario_id', usuarioActual.id)
-                    .eq('local_id', localActual.id)
-                    .eq('fecha', hoy)
-                    .eq('estado', 'abierta')
-                    .order('fecha_creacion', { ascending: false })
-                    .limit(1);
-
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    cajaActual = data[0];
-                    
-                    // Calcular ventas en efectivo del día
-                    const { data: ventasEfectivo } = await supabase
-                        .from('pos_ventas')
-                        .select('total')
-                        .eq('usuario_id', usuarioActual.id)
-                        .eq('local_id', localActual.id)
-                        .eq('fecha_venta', hoy)
-                        .eq('metodo_pago', 'Efectivo');
-
-                    const ventasEfectivoTotal = ventasEfectivo.reduce((sum, v) => sum + v.total, 0);
-                    const totalEsperado = cajaActual.saldo_inicial + ventasEfectivoTotal;
-
-                    document.getElementById('estadoCaja').innerHTML = `
-                        <p><strong>Caja Abierta</strong></p>
-                        <p>Saldo Inicial: $${cajaActual.saldo_inicial.toFixed(2)}</p>
-                        <p>Ventas Efectivo: $${ventasEfectivoTotal.toFixed(2)}</p>
-                        <p>Total Esperado: $${totalEsperado.toFixed(2)}</p>
-                    `;
-
-                    document.getElementById('cierreSaldoInicial').textContent = `$${cajaActual.saldo_inicial.toFixed(2)}`;
-                    document.getElementById('cierreVentasEfectivo').textContent = `$${ventasEfectivoTotal.toFixed(2)}`;
-                    document.getElementById('cierreTotalEsperado').textContent = `$${totalEsperado.toFixed(2)}`;
-
-                } else {
-                    cajaActual = null;
-                    document.getElementById('estadoCaja').innerHTML = '<p>No hay caja abierta</p>';
-                }
-
-            } catch (error) {
-                console.error('Error cargando caja:', error);
-            }
-        }
-
-        // CERRAR CAJA
-        async function cerrarCaja() {
-            if (!cajaActual) {
-                alert('No hay caja abierta');
-                return;
-            }
-
-            const totalContado = parseFloat(document.getElementById('cierreTotalContado').value);
-            const totalEsperado = parseFloat(document.getElementById('cierreTotalEsperado').textContent.replace('$', ''));
-            const diferencia = totalContado - totalEsperado;
-
-            try {
-                const { error } = await supabase
-                    .from('pos_cajas')
-                    .update({
-                        saldo_efectivo: totalContado,
-                        total_vendido: totalEsperado - cajaActual.saldo_inicial,
-                        diferencia: diferencia,
-                        estado: 'cerrada'
-                    })
-                    .eq('id', cajaActual.id);
-
-                if (error) throw error;
-
-                alert(`✓ Caja cerrada exitosamente\nDiferencia: $${diferencia.toFixed(2)}`);
-                document.getElementById('cierreTotalContado').value = '';
-                cajaActual = null;
-                await cargarCajaActual();
-
-            } catch (error) {
-                console.error('Error cerrando caja:', error);
-                alert('Error al cerrar la caja');
-            }
-        }
-
-        // CARGAR REPORTES
         async function cargarReportes() {
             try {
-                const fechaDesde = document.getElementById('reporteFechaDesde').value || new Date(new Date().setDate(new Date().getDate() - 7)).toISOString().split('T')[0];
-                const fechaHasta = document.getElementById('reporteFechaHasta').value || new Date().toISOString().split('T')[0];
-
-                let query = supabase
+                const { data, error } = await supabase
                     .from('pos_ventas')
-                    .select('*, pos_usuarios(nombre)')
+                    .select('*')
                     .eq('local_id', localActual.id)
-                    .gte('fecha_venta', fechaDesde)
-                    .lte('fecha_venta', fechaHasta)
-                    .order('fecha_venta', { ascending: false });
-
-                const { data, error } = await query;
+                    .order('fecha_venta', { ascending: false })
+                    .limit(20);
 
                 if (error) throw error;
 
                 const tbody = document.getElementById('reportesTableBody');
-                tbody.innerHTML = data.map(venta => `
+                tbody.innerHTML = data.length > 0 ? data.map(venta => `
                     <tr>
                         <td>${venta.fecha_venta}</td>
                         <td>#${venta.numero_factura}</td>
                         <td>${venta.cliente_nombre}</td>
-                        <td>${venta.metodo_pago}</td>
                         <td>$${venta.total.toFixed(2)}</td>
-                        <td>${venta.pos_usuarios?.nombre || '-'}</td>
                     </tr>
-                `).join('');
-
-                // Calcular resumen
-                const total = data.reduce((sum, v) => sum + v.total, 0);
-                const efectivo = data.filter(v => v.metodo_pago === 'Efectivo').reduce((sum, v) => sum + v.total, 0);
-                const transferencias = data.filter(v => v.metodo_pago === 'Transferencia').reduce((sum, v) => sum + v.total, 0);
-
-                document.getElementById('resumenTotal').textContent = `$${total.toFixed(2)}`;
-                document.getElementById('resumenEfectivo').textContent = `$${efectivo.toFixed(2)}`;
-                document.getElementById('resumenTransferencias').textContent = `$${transferencias.toFixed(2)}`;
-
+                `).join('') : '<tr><td colspan="4" style="text-align: center;">Sin ventas</td></tr>';
             } catch (error) {
-                console.error('Error cargando reportes:', error);
+                console.error('Error:', error);
             }
         }
 
-        // GESTIÓN DE PRODUCTOS (MATRIZ)
-        async function cargarProductosTabla() {
-            try {
-                const { data, error } = await supabase
-                    .from('pos_productos')
-                    .select('*')
-                    .order('categoria', { ascending: true });
-
-                if (error) throw error;
-
-                const tbody = document.getElementById('productosTableBody');
-                tbody.innerHTML = data.map(prod => `
-                    <tr>
-                        <td>${prod.codigo}</td>
-                        <td>${prod.nombre}</td>
-                        <td>${prod.categoria}</td>
-                        <td>$${prod.precio_venta.toFixed(2)}</td>
-                        <td>
-                            <button class="btn" onclick="editarProducto(${prod.id})" style="padding: 5px 10px; font-size: 12px;">Editar</button>
-                            <button class="btn btn-danger" onclick="eliminarProducto(${prod.id})" style="padding: 5px 10px; font-size: 12px;">Eliminar</button>
-                        </td>
-                    </tr>
-                `).join('');
-
-            } catch (error) {
-                console.error('Error cargando productos tabla:', error);
-            }
-        }
-
-        // MODALES
-        function abrirModalNuevoProducto() {
-            document.getElementById('modalProducto').classList.add('show');
-        }
-
-        function cerrarModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-        }
-
-        async function guardarProducto() {
-            const codigo = document.getElementById('productoCodigoInput').value.trim();
-            const nombre = document.getElementById('productoNombreInput').value.trim();
-            const categoria = document.getElementById('productoCategoriaInput').value.trim();
-            const precio = parseFloat(document.getElementById('productoPrecioInput').value);
-
-            if (!codigo || !nombre || !categoria || !precio) {
-                alert('Por favor completa todos los campos');
-                return;
-            }
-
-            try {
-                const { error } = await supabase
-                    .from('pos_productos')
-                    .insert({
-                        codigo,
-                        nombre,
-                        categoria,
-                        precio_venta: precio
-                    });
-
-                if (error) throw error;
-
-                alert('✓ Producto creado exitosamente');
-                cerrarModal('modalProducto');
-                document.getElementById('productoCodigoInput').value = '';
-                document.getElementById('productoNombreInput').value = '';
-                document.getElementById('productoCategoriaInput').value = '';
-                document.getElementById('productoPrecioInput').value = '';
-                
-                await cargarProductos();
-                await cargarProductosTabla();
-
-            } catch (error) {
-                console.error('Error guardando producto:', error);
-                alert('Error al crear el producto');
-            }
-        }
-
-        async function eliminarProducto(id) {
-            if (!confirm('¿Eliminar este producto?')) return;
-
-            try {
-                const { error } = await supabase
-                    .from('pos_productos')
-                    .update({ activo: false })
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                alert('✓ Producto eliminado');
-                await cargarProductos();
-                await cargarProductosTabla();
-
-            } catch (error) {
-                console.error('Error eliminando producto:', error);
-                alert('Error al eliminar el producto');
-            }
-        }
-
-        // GUÍAS
-        function abrirModalNuevaGuia() {
-            const select = document.getElementById('guiaLocalDestino');
-            select.innerHTML = '';
-
-            supabase.from('pos_locales')
-                .select('id, nombre')
-                .neq('id', localActual.id)
-                .eq('activo', true)
-                .then(({ data }) => {
-                    data.forEach(local => {
-                        const option = document.createElement('option');
-                        option.value = local.id;
-                        option.textContent = local.nombre;
-                        select.appendChild(option);
-                    });
-                });
-
-            document.getElementById('modalGuia').classList.add('show');
-        }
-
-        async function guardarGuia() {
-            const localDestino = parseInt(document.getElementById('guiaLocalDestino').value);
-            const productoId = parseInt(document.getElementById('guiaProducto').value);
-            const cantidad = parseFloat(document.getElementById('guiaCantidad').value);
-            const lote = document.getElementById('guiaLote').value.trim();
-            const vencimiento = document.getElementById('guiaVencimiento').value;
-
-            if (!localDestino || !productoId || !cantidad) {
-                alert('Por favor completa los campos requeridos');
-                return;
-            }
-
-            try {
-                // Generar número de guía
-                const { data: maxGuia } = await supabase
-                    .from('pos_guias_productos')
-                    .select('numero_guia')
-                    .order('numero_guia', { ascending: false })
-                    .limit(1);
-
-                const numeroGuia = (maxGuia && maxGuia.length > 0 ? maxGuia[0].numero_guia + 1 : 5000);
-
-                // Crear guía
-                const { data: guia, error: errorGuia } = await supabase
-                    .from('pos_guias_productos')
-                    .insert({
-                        numero_guia: numeroGuia,
-                        local_origen_id: localActual.id,
-                        local_destino_id: localDestino,
-                        fecha_envio: new Date().toISOString().split('T')[0],
-                        estado: 'pendiente',
-                        usuario_id_envio: usuarioActual.id
-                    })
-                    .select()
-                    .single();
-
-                if (errorGuia) throw errorGuia;
-
-                // Agregar detalle
-                const { error: errorDetalle } = await supabase
-                    .from('pos_detalle_guias')
-                    .insert({
-                        guia_id: guia.id,
-                        producto_id: productoId,
-                        cantidad,
-                        lote: lote || null,
-                        fecha_vencimiento: vencimiento || null
-                    });
-
-                if (errorDetalle) throw errorDetalle;
-
-                alert(`✓ Guía #${numeroGuia} creada exitosamente`);
-                cerrarModal('modalGuia');
-                document.getElementById('guiaCantidad').value = '';
-                document.getElementById('guiaLote').value = '';
-                document.getElementById('guiaVencimiento').value = '';
-
-                await cargarGuias();
-
-            } catch (error) {
-                console.error('Error creando guía:', error);
-                alert('Error al crear la guía');
-            }
-        }
-
-        async function cargarGuias() {
-            try {
-                if (localActual.es_matriz) {
-                    // Guías enviadas por MATRIZ
-                    const { data, error } = await supabase
-                        .from('pos_guias_productos')
-                        .select('*')
-                        .eq('local_origen_id', localActual.id)
-                        .order('fecha_envio', { ascending: false });
-
-                    if (error) throw error;
-
-                    const tbody = document.getElementById('guiasMatrizTableBody');
-                    tbody.innerHTML = data.map(guia => `
-                        <tr>
-                            <td>#${guia.numero_guia}</td>
-                            <td>${guia.local_destino_id}</td>
-                            <td>${guia.fecha_envio}</td>
-                            <td><span class="estado-badge estado-${guia.estado}">${guia.estado}</span></td>
-                            <td>
-                                <button class="btn" onclick="verDetalleGuia(${guia.id})" style="padding: 5px 10px; font-size: 12px;">Ver</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                } else {
-                    // Guías recibidas por LOCAL
-                    const { data, error } = await supabase
-                        .from('pos_guias_productos')
-                        .select('*')
-                        .eq('local_destino_id', localActual.id)
-                        .order('fecha_envio', { ascending: false });
-
-                    if (error) throw error;
-
-                    const tbody = document.getElementById('guiasLocalTableBody');
-                    tbody.innerHTML = data.map(guia => `
-                        <tr>
-                            <td>#${guia.numero_guia}</td>
-                            <td>MATRIZ</td>
-                            <td>${guia.fecha_envio}</td>
-                            <td>${guia.estado === 'pendiente' ? '1 producto' : '-'}</td>
-                            <td><span class="estado-badge estado-${guia.estado}">${guia.estado}</span></td>
-                            <td>
-                                ${guia.estado === 'pendiente' ? `<button class="btn btn-success" onclick="recibirGuia(${guia.id})" style="padding: 5px 10px; font-size: 12px;">Recibir</button>` : '-'}
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-
-            } catch (error) {
-                console.error('Error cargando guías:', error);
-            }
-        }
-
-        async function recibirGuia(guiaId) {
-            try {
-                const { error } = await supabase
-                    .from('pos_guias_productos')
-                    .update({
-                        estado: 'recibida',
-                        fecha_recepcion: new Date().toISOString().split('T')[0],
-                        usuario_id_recepcion: usuarioActual.id
-                    })
-                    .eq('id', guiaId);
-
-                if (error) throw error;
-
-                alert('✓ Guía recibida correctamente');
-                await cargarGuias();
-
-            } catch (error) {
-                console.error('Error recibiendo guía:', error);
-                alert('Error al recibir la guía');
-            }
-        }
-
-        // NAVEGACIÓN
         function irPos() {
-            cambiarPagina('posPage');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function irCaja() {
-            cambiarPagina('cajaPage');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+            document.getElementById('posPage').classList.add('show');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function irReportes() {
-            cambiarPagina('reportesPage');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+            document.getElementById('reportesPage').classList.add('show');
             cargarReportes();
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
         }
 
         function irProductos() {
-            cambiarPagina('productosPage');
-            cargarProductosTabla();
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+            document.getElementById('productosPage').classList.add('show');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
         }
 
-        function irGuias() {
-            cambiarPagina('guiasPage');
-            cargarGuias();
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        function cambiarPagina(pageId) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('show'));
-            document.getElementById(pageId).classList.add('show');
-        }
-
-        // UTILIDADES
-        function actualizarHora() {
-            const ahora = new Date();
-            document.getElementById('headerHora').textContent = ahora.toLocaleTimeString('es-ES');
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                usuarioActual = null;
+                localActual = null;
+                carrito = [];
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('usuario').value = '';
+                document.getElementById('password').value = '';
+            }
         }
 
         function mostrarError(mensaje) {
             const div = document.getElementById('loginError');
             div.textContent = mensaje;
-            div.style.display = 'block';
+            div.classList.add('show');
             setTimeout(() => {
-                div.style.display = 'none';
+                div.classList.remove('show');
             }, 5000);
         }
-
-        window.addEventListener('beforeunload', (e) => {
-            if (usuarioActual) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
     </script>
 </body>
 </html>
