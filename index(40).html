@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexOps AI - POS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h2 { text-align: center; margin-bottom: 30px; color: #667eea; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover { background: #5568d3; }
+        .btn:disabled { background: #ccc; }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            background: #f8d7da;
+            border: 1px solid #ff6b6b;
+            color: #721c24;
+            display: none;
+        }
+        
+        .alert.show { display: block; }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-main {
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 0;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-btn:hover { background: #eee; }
+        .nav-btn.active { color: #667eea; border-bottom-color: #667eea; background: #f0f4ff; }
+        
+        .content { padding: 20px; background: white; min-height: 80vh; }
+        .page { display: none; }
+        .page.show { display: block; }
+        
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .producto-btn {
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .producto-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .producto-precio { color: #51cf66; font-weight: bold; margin-top: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        table th { background: #f8f9fa; font-weight: 600; }
+        
+        .loading { text-align: center; padding: 20px; color: #999; }
+        
+        .btn-logout { background: #ff6b6b; width: auto; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h2>🚀 ApexOps AI</h2>
+            <div id="error" class="alert"></div>
+            
+            <div class="form-group">
+                <label>📍 Local</label>
+                <select id="localSelect">
+                    <option value="">-- Selecciona --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>👤 Usuario</label>
+                <input type="text" id="usuarioInput" placeholder="usuario1">
+            </div>
+
+            <div class="form-group">
+                <label>🔒 Contraseña</label>
+                <input type="password" id="passwordInput" placeholder="1234">
+            </div>
+
+            <button class="btn" onclick="login()">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="mainApp" style="display:none;">
+        <div class="header">
+            <h1>🚀 ApexOps AI</h1>
+            <div>
+                <span id="infoHeader">-</span>
+                <button class="btn btn-logout" onclick="logout()">Salir</button>
+            </div>
+        </div>
+
+        <div class="nav-main">
+            <button class="nav-btn active" onclick="goPage('pos')">📦 POS</button>
+            <button class="nav-btn" onclick="goPage('reportes')">📊 Reportes</button>
+        </div>
+
+        <div class="content">
+            <!-- POS -->
+            <div id="posPage" class="page show">
+                <h2>📦 POS - Venta</h2>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <div>
+                        <h3>Productos</h3>
+                        <div id="productosGrid" class="productos-grid"></div>
+                    </div>
+                    <div>
+                        <h3>Carrito</h3>
+                        <div id="carrito" style="background: #f8f9fa; padding: 15px; border-radius: 4px; height: 300px; overflow-y: auto;"></div>
+                        <div style="margin-top: 20px;">
+                            <strong>Total: $<span id="totalCarrito">0.00</span></strong>
+                        </div>
+                        <button class="btn" onclick="vender()" style="background: #51cf66; margin-top: 10px;">✓ Vender</button>
+                        <button class="btn" onclick="limpiarCarrito()" style="background: #999; margin-top: 10px;">Limpiar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTES -->
+            <div id="reportesPage" class="page">
+                <h2>📊 Reportes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Factura</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportesBody">
+                        <tr><td colspan="3" style="text-align: center;">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://kwuzffxcahzqpzfohlup.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3dXpmZnhjYWh6cXB6Zm9obHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MDIzNzMsImV4cCI6MjA4OTk3ODM3M30.6FVlmfIvqjsLt-i3SAvbcZUEIXkb2fcoyYngzwDgnc4';
+
+        const { createClient } = window.supabase;
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let usuarioActual = null;
+        let localActual = null;
+        let carrito = [];
+        let productos = [];
+
+        // INICIALIZAR
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Cargando locales...');
+            loadLocales();
+        });
+
+        async function loadLocales() {
+            try {
+                const { data, error } = await supabase
+                    .from('pos_locales')
+                    .select('*')
+                    .order('es_matriz', { ascending: false });
+
+                if (error) {
+                    console.error('Error:', error);
+                    showError('Error cargando locales: ' + error.message);
+                    return;
+                }
+
+                console.log('Locales:', data);
+                const select = document.getElementById('localSelect');
+                select.innerHTML = '<option value="">-- Selecciona --</option>';
+                
+                data.forEach(local => {
+                    const opt = document.createElement('option');
+                    opt.value = local.id;
+                    opt.text = local.nombre;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Excepción:', e);
+                showError('Error: ' + e.message);
+            }
+        }
+
+        async function login() {
+            const localId = document.getElementById('localSelect').value;
+            const usuario = document.getElementById('usuarioInput').value;
+            const pass = document.getElementById('passwordInput').value;
+
+            if (!localId || !usuario || !pass) {
+                showError('Completa todos los campos');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('pos_usuarios')
+                    .select('*')
+                    .eq('local_id', parseInt(localId))
+                    .eq('usuario', usuario)
+                    .single();
+
+                if (error || !data) {
+                    showError('Usuario no encontrado');
+                    return;
+                }
+
+                if (data.contraseña !== pass) {
+                    showError('Contraseña incorrecta');
+                    return;
+                }
+
+                usuarioActual = data;
+                
+                const { data: local } = await supabase
+                    .from('pos_locales')
+                    .select('*')
+                    .eq('id', parseInt(localId))
+                    .single();
+
+                localActual = local;
+
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('infoHeader').textContent = `${local.nombre} - ${usuarioActual.nombre}`;
+
+                loadProductos();
+                loadReportes();
+
+            } catch (e) {
+                console.error('Error:', e);
+                showError('Error: ' + e.message);
+            }
+        }
+
+        async function loadProductos() {
+            try {
+                const { data, error } = await supabase
+                    .from('pos_productos')
+                    .select('*')
+                    .order('nombre');
+
+                if (error) throw error;
+
+                productos = data;
+                const grid = document.getElementById('productosGrid');
+                grid.innerHTML = '';
+
+                data.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.className = 'producto-btn';
+                    btn.innerHTML = `<div>${p.codigo}</div><div>${p.nombre}</div><div class="producto-precio">$${p.precio_venta}</div>`;
+                    btn.onclick = () => agregarCarrito(p);
+                    grid.appendChild(btn);
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function agregarCarrito(p) {
+            const existe = carrito.find(x => x.id === p.id);
+            if (existe) {
+                existe.qty++;
+            } else {
+                carrito.push({...p, qty: 1});
+            }
+            mostrarCarrito();
+        }
+
+        function mostrarCarrito() {
+            const div = document.getElementById('carrito');
+            if (carrito.length === 0) {
+                div.innerHTML = '<p style="color: #999; text-align: center;">Carrito vacío</p>';
+            } else {
+                div.innerHTML = carrito.map((item, i) => `
+                    <div style="background: white; padding: 8px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <strong>${item.nombre}</strong><br>
+                            <small>$${item.precio_venta}</small>
+                        </div>
+                        <input type="number" value="${item.qty}" min="1" onchange="cambiarQty(${i}, this.value)" style="width: 50px; padding: 4px;">
+                        <button onclick="quitarCarrito(${i})" style="background: #ff6b6b; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 2px;">×</button>
+                    </div>
+                `).join('');
+            }
+
+            const total = carrito.reduce((sum, item) => sum + (item.precio_venta * item.qty), 0);
+            document.getElementById('totalCarrito').textContent = total.toFixed(2);
+        }
+
+        function cambiarQty(i, val) {
+            carrito[i].qty = Math.max(1, parseInt(val) || 1);
+            mostrarCarrito();
+        }
+
+        function quitarCarrito(i) {
+            carrito.splice(i, 1);
+            mostrarCarrito();
+        }
+
+        async function vender() {
+            if (carrito.length === 0) {
+                alert('Carrito vacío');
+                return;
+            }
+
+            try {
+                const total = carrito.reduce((sum, item) => sum + (item.precio_venta * item.qty), 0);
+                
+                const { data: venta, error } = await supabase
+                    .from('pos_ventas')
+                    .insert({
+                        numero_factura: Math.floor(Math.random() * 9000) + 1000,
+                        local_id: localActual.id,
+                        usuario_id: usuarioActual.id,
+                        fecha_venta: new Date().toISOString().split('T')[0],
+                        cliente_nombre: 'CONSUMIDOR',
+                        total: total,
+                        metodo_pago: 'Efectivo',
+                        estado: 'activa'
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                const detalles = carrito.map(item => ({
+                    venta_id: venta.id,
+                    producto_id: item.id,
+                    cantidad: item.qty,
+                    valor_unitario: item.precio_venta,
+                    subtotal: item.precio_venta * item.qty
+                }));
+
+                await supabase.from('pos_detalle_ventas').insert(detalles);
+
+                alert(`✓ Venta #${venta.numero_factura} - Total: $${total.toFixed(2)}`);
+                carrito = [];
+                mostrarCarrito();
+                loadReportes();
+
+            } catch (e) {
+                console.error(e);
+                alert('Error: ' + e.message);
+            }
+        }
+
+        function limpiarCarrito() {
+            carrito = [];
+            mostrarCarrito();
+        }
+
+        async function loadReportes() {
+            try {
+                const { data, error } = await supabase
+                    .from('pos_ventas')
+                    .select('*')
+                    .eq('local_id', localActual.id)
+                    .order('fecha_venta', { ascending: false })
+                    .limit(20);
+
+                if (error) throw error;
+
+                const tbody = document.getElementById('reportesBody');
+                tbody.innerHTML = data.map(v => `
+                    <tr>
+                        <td>${v.fecha_venta}</td>
+                        <td>#${v.numero_factura}</td>
+                        <td>$${v.total.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function goPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('show'));
+            document.getElementById(page + 'Page').classList.add('show');
+            
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function logout() {
+            if (confirm('¿Salir?')) {
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+                usuarioActual = null;
+                localActual = null;
+            }
+        }
+
+        function showError(msg) {
+            const div = document.getElementById('error');
+            div.textContent = msg;
+            div.classList.add('show');
+            setTimeout(() => div.classList.remove('show'), 5000);
+        }
+    </script>
+</body>
+</html>
