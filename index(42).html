@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexOps AI - POS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f0f0; }
+        
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .login-box h1 { text-align: center; color: #667eea; margin-bottom: 40px; font-size: 32px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .btn-login:hover { background: #5568d3; }
+        
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .app-page { display: none; }
+        .app-page.active { display: block; }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { font-size: 24px; }
+        
+        .header-info { text-align: right; }
+        .header-info div { font-size: 14px; margin-bottom: 5px; }
+        
+        .btn-logout {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .menu-nav {
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+        }
+        
+        .menu-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .menu-btn:hover { background: #eee; }
+        .menu-btn.active { color: #667eea; border-bottom-color: #667eea; }
+        
+        .content { padding: 30px; background: white; min-height: calc(100vh - 120px); }
+        
+        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        
+        .productos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        
+        .prod-btn {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        
+        .prod-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .prod-precio { color: #28a745; font-weight: bold; margin-top: 5px; font-size: 12px; }
+        
+        .carrito-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 300px;
+        }
+        
+        .carrito-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #667eea;
+        }
+        
+        .carrito-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+        
+        .btn-vender {
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .btn-vender:hover { background: #218838; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .loading { text-align: center; padding: 20px; color: #999; }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-page">
+    <div class="login-box">
+        <h1>🚀 ApexOps AI</h1>
+        <div id="errorMsg" class="error-msg"></div>
+        
+        <div class="form-group">
+            <label>Local:</label>
+            <select id="selectLocal">
+                <option value="">Cargando...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Usuario:</label>
+            <input type="text" id="inputUser" placeholder="usuario1">
+        </div>
+        
+        <div class="form-group">
+            <label>Contraseña:</label>
+            <input type="password" id="inputPass" placeholder="1234">
+        </div>
+        
+        <button class="btn-login" onclick="doLogin()">Ingresar</button>
+    </div>
+</div>
+
+<!-- APP PAGE -->
+<div id="appPage" class="app-page">
+    <div class="header">
+        <h1>🚀 ApexOps AI - POS</h1>
+        <div class="header-info">
+            <div id="headerLocal">-</div>
+            <div id="headerUser">-</div>
+            <button class="btn-logout" onclick="doLogout()">Cerrar Sesión</button>
+        </div>
+    </div>
+    
+    <div class="menu-nav">
+        <button class="menu-btn active" onclick="showPage('pos')">📦 POS</button>
+        <button class="menu-btn" onclick="showPage('reportes')">📊 Reportes</button>
+    </div>
+    
+    <div class="content">
+        <!-- POS PAGE -->
+        <div id="posPage" class="app-page active">
+            <h2>Sistema de Venta</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>Productos Disponibles</h3>
+                    <div id="productosContainer" class="productos-grid"></div>
+                </div>
+                <div>
+                    <h3>Carrito</h3>
+                    <div id="carritoContainer" class="carrito-box">
+                        <p class="loading">Carrito vacío</p>
+                    </div>
+                    <div class="carrito-total">
+                        Total: $<span id="totalAmount">0.00</span>
+                    </div>
+                    <button class="btn-vender" onclick="procesarVenta()">✓ Generar Venta</button>
+                    <button style="width: 100%; padding: 10px; background: #999; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 5px;" onclick="limpiarCarrito()">Limpiar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- REPORTES PAGE -->
+        <div id="reportesPage" class="app-page">
+            <h2>Reportes de Ventas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Factura #</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="reportesBody">
+                    <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://kwuzffxcahzqpzfohlup.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3dXpmZnhjYWh6cXB6Zm9obHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MDIzNzMsImV4cCI6MjA4OTk3ODM3M30.6FVlmfIvqjsLt-i3SAvbcZUEIXkb2fcoyYngzwDgnc4';
+
+console.log('Supabase URL:', SUPABASE_URL);
+console.log('Supabase Key:', SUPABASE_KEY.substring(0, 20) + '...');
+
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let user = null;
+let local = null;
+let cart = [];
+let products = [];
+
+window.addEventListener('DOMContentLoaded', initApp);
+
+async function initApp() {
+    console.log('Iniciando...');
+    await loadLocales();
+}
+
+async function loadLocales() {
+    try {
+        const { data, error } = await supabase
+            .from('pos_locales')
+            .select('*')
+            .order('es_matriz', { ascending: false });
+        
+        if (error) throw error;
+        
+        const select = document.getElementById('selectLocal');
+        select.innerHTML = '<option value="">Selecciona local</option>';
+        
+        data.forEach(loc => {
+            const opt = document.createElement('option');
+            opt.value = loc.id;
+            opt.textContent = loc.nombre;
+            select.appendChild(opt);
+        });
+    } catch (e) {
+        showError('Error: ' + e.message);
+    }
+}
+
+async function doLogin() {
+    const localId = document.getElementById('selectLocal').value;
+    const usuario = document.getElementById('inputUser').value;
+    const pass = document.getElementById('inputPass').value;
+    
+    if (!localId || !usuario || !pass) {
+        showError('Completa todos los campos');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('pos_usuarios')
+            .select('*')
+            .eq('local_id', parseInt(localId))
+            .eq('usuario', usuario)
+            .single();
+        
+        if (error || !data) {
+            showError('Usuario no encontrado');
+            return;
+        }
+        
+        if (data.contraseña !== pass) {
+            showError('Contraseña incorrecta');
+            return;
+        }
+        
+        user = data;
+        
+        const { data: locData } = await supabase
+            .from('pos_locales')
+            .select('*')
+            .eq('id', parseInt(localId))
+            .single();
+        
+        local = locData;
+        
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('appPage').classList.add('active');
+        document.getElementById('headerLocal').textContent = 'Local: ' + local.nombre;
+        document.getElementById('headerUser').textContent = 'Usuario: ' + user.nombre;
+        
+        await loadProducts();
+        await loadReports();
+        
+    } catch (e) {
+        showError('Error: ' + e.message);
+    }
+}
+
+async function loadProducts() {
+    try {
+        const { data, error } = await supabase
+            .from('pos_productos')
+            .select('*')
+            .order('nombre');
+        
+        if (error) throw error;
+        
+        products = data;
+        const grid = document.getElementById('productosContainer');
+        grid.innerHTML = '';
+        
+        data.forEach(p => {
+            const btn = document.createElement('button');
+            btn.className = 'prod-btn';
+            btn.innerHTML = `
+                <div>${p.codigo}</div>
+                <div>${p.nombre}</div>
+                <div class="prod-precio">$${p.precio_venta}</div>
+            `;
+            btn.onclick = () => addToCart(p);
+            grid.appendChild(btn);
+        });
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function addToCart(p) {
+    const existe = cart.find(x => x.id === p.id);
+    if (existe) {
+        existe.qty++;
+    } else {
+        cart.push({ ...p, qty: 1 });
+    }
+    showCart();
+}
+
+function showCart() {
+    const div = document.getElementById('carritoContainer');
+    
+    if (cart.length === 0) {
+        div.innerHTML = '<p class="loading">Carrito vacío</p>';
+    } else {
+        div.innerHTML = cart.map((item, i) => `
+            <div class="carrito-item">
+                <div style="flex: 1;">
+                    <strong>${item.nombre}</strong><br>
+                    <small>$${item.precio_venta}</small>
+                </div>
+                <input type="number" value="${item.qty}" min="1" onchange="changeQty(${i}, this.value)" style="width: 50px;">
+                <button onclick="removeFromCart(${i})" style="background: #ff6b6b; color: white; border: none; padding: 5px 10px; cursor: pointer;">×</button>
+            </div>
+        `).join('');
+    }
+    
+    const total = cart.reduce((sum, item) => sum + (item.precio_venta * item.qty), 0);
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+}
+
+function changeQty(i, val) {
+    cart[i].qty = Math.max(1, parseInt(val) || 1);
+    showCart();
+}
+
+function removeFromCart(i) {
+    cart.splice(i, 1);
+    showCart();
+}
+
+async function procesarVenta() {
+    if (cart.length === 0) {
+        alert('Carrito vacío');
+        return;
+    }
+    
+    try {
+        const total = cart.reduce((sum, item) => sum + (item.precio_venta * item.qty), 0);
+        const factura = Math.floor(Math.random() * 9000) + 1000;
+        
+        const { data: venta, error: errVenta } = await supabase
+            .from('pos_ventas')
+            .insert({
+                numero_factura: factura,
+                local_id: local.id,
+                usuario_id: user.id,
+                fecha_venta: new Date().toISOString().split('T')[0],
+                cliente_nombre: 'CONSUMIDOR',
+                total: total,
+                metodo_pago: 'Efectivo',
+                estado: 'activa'
+            })
+            .select()
+            .single();
+        
+        if (errVenta) throw errVenta;
+        
+        const detalles = cart.map(item => ({
+            venta_id: venta.id,
+            producto_id: item.id,
+            cantidad: item.qty,
+            valor_unitario: item.precio_venta,
+            subtotal: item.precio_venta * item.qty
+        }));
+        
+        const { error: errDetalles } = await supabase
+            .from('pos_detalle_ventas')
+            .insert(detalles);
+        
+        if (errDetalles) throw errDetalles;
+        
+        alert('✓ Venta #' + factura + ' generada\nTotal: $' + total.toFixed(2));
+        cart = [];
+        showCart();
+        await loadReports();
+        
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+function limpiarCarrito() {
+    cart = [];
+    showCart();
+}
+
+async function loadReports() {
+    try {
+        const { data, error } = await supabase
+            .from('pos_ventas')
+            .select('*')
+            .eq('local_id', local.id)
+            .order('fecha_venta', { ascending: false })
+            .limit(20);
+        
+        if (error) throw error;
+        
+        const tbody = document.getElementById('reportesBody');
+        tbody.innerHTML = data.map(v => `
+            <tr>
+                <td>${v.fecha_venta}</td>
+                <td>#${v.numero_factura}</td>
+                <td>${v.cliente_nombre}</td>
+                <td>$${v.total.toFixed(2)}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+function showPage(page) {
+    document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
+    document.getElementById(page + 'Page').classList.add('active');
+    
+    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function doLogout() {
+    if (confirm('¿Cerrar sesión?')) {
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('appPage').classList.remove('active');
+        user = null;
+        local = null;
+        cart = [];
+    }
+}
+
+function showError(msg) {
+    const div = document.getElementById('errorMsg');
+    div.textContent = msg;
+    div.style.display = 'block';
+    setTimeout(() => div.style.display = 'none', 5000);
+}
+</script>
+
+</body>
+</html>
